@@ -1,0 +1,11 @@
+오후 8:32	Packages installed successfully: Installed packages: 'JPype1'
+
+오후 8:33	Packages installed successfully: Installed packages: 'pytagcloud'
+
+오후 8:34	Packages installed successfully: Installed packages: 'matplotlib'
+
+오후 8:34	Packages installed successfully: Installed packages: 'Pygame'
+
+오후 8:35	Packages installed successfully: Installed packages: 'konlpy'
+
+오후 8:35	Packages installed successfully: Installed packages: 'simplejson'

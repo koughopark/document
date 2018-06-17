@@ -1,0 +1,4 @@
+callable(func) = func 가 호출가능한 객체(함수)인지 확인하여 True, False 값으로 반환
+
+if callable(success) is False: // success 가 호출가능(callable)한 함수가 아니지? 그렇다면:
+if callable(success) is True: // success 가 호출가능(callable)한 함수지? 그렇다면:

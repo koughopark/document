@@ -1,0 +1,7 @@
+1. JPype1
+2. konlpy
+3. matplotlib
+4. pygame
+5. pytagcloud
+6. simplejson
+7. pandas

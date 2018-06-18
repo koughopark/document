@@ -1,0 +1,99 @@
+java.oracle.com
+eclipse.ort
+
+bit.ly/lbt-java
+https://github.com/namsk/b1-java
+https://github.com/namsk/bl-java.git
+
+C:\Program Files\Java\jdk1.8.0_171
+JAVA_HOME
+%JAVA_HOME%\bin
+
+
+========================================================================================================================
+
+
+package com.javaex.oop.methods;
+
+public class MethodEx2 {
+	public static void main(String[] args) {
+		System.out.println(getSum(new double[] {
+				1,2,3,4,5,6,7,8,9,0
+		}));
+		System.out.println(getSumVar(				<-- 가변인수 사용
+				1,2,3,4,5,6,7,8,9,0
+				));
+	}
+
+	//	배열을 이용한 가변 인수 전달
+	public static double getSum(double[] values) {
+		double total = 0;
+
+		for(double value:values) {
+			total += value;
+		}
+
+		return total;
+	}
+
+	//	가변 인수를 이용한 다수의 인수 전달
+	public static double getSumVar(double ... values) {		<-- 가변인수
+		double total = 0;
+
+		for(double value:values) {
+			total += value;
+		}
+
+		return total;
+	}
+}
+
+
+DTO
+Data Transfer Object
+데이터베이스에서 데이터 전달할때 사용하는 개념
+
+VO(Getter, Setter)
+Value Object
+기능수행없는 데이터 전달
+
+
+========================================================================================================================
+
+https://docs.oracle.com/javase/8/docs/api/index.html
+
+========================================================================================================================
+
+강의 자료실:
+http://bit.ly/lbt-python
+
+파이썬:
+https:www.python.org/
+
+Visual Studio Code:
+https://www.visualstudio.com/ko/
+
+Win + R -> cmd
+
+import sys
+import io
+
+sys.stdout = io.TextIOWrapper(sys.stdout.detach(), encoding = 'utf-8')
+
+sys.stderr = io.TextIOWrapper(sys.stderr.detach(), encoding = 'utf-8')
+
+========================================================================================================================
+
+https://www.putty.org
+
+========================================================================================================================
+
+
+
+========================================================================================================================
+
+
+
+========================================================================================================================
+
+

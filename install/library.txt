@@ -9,3 +9,5 @@
 오후 8:35	Packages installed successfully: Installed packages: 'konlpy'
 
 오후 8:35	Packages installed successfully: Installed packages: 'simplejson'
+
+오전 10:28	Packages installed successfully: Installed packages: 'scipy'

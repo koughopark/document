@@ -13,3 +13,5 @@
 오후 11:42	Packages installed successfully: Installed packages: 'pandas'
 
 오전 10:28	Packages installed successfully: Installed packages: 'scipy'
+
+오후 3:36	Packages installed successfully: Installed packages: 'beautifulsoup4'

@@ -32,3 +32,33 @@ links = soup.findAll("a")  # 모든 <a> 태그를 추출한다.
 
 href = a.attrs['href']  # a에 포함된 href 속성의 값을 추출
 a.string    # a에 포함된 string 값을 추출
+
+h1 = soup.select_one("div#test > select").string    # div = test > select 태그에서 문자열 추출
+input_list = soup.select("div#test > input.tete")   # dif = test > input = tete> 태그의 데이터 추출 (>) 문자 앞뒤 공백 필수
+
+a_list = soup.select("#mw-content-text > div > ul > li + li")   # li 다음 li 태그를 추출
+
+sel = lambda q : print(soup.select_one(q).string)   # sel(인수) 인수값에 해당하는 데이터에서 문자열 추출
+sel("#ca-nstab-main")   # id가 ca-nstab-main 인 데이터 추출
+sel("li#ca-nstab-main") # li 이고 id가 ca-nstab-main 인 데이터 추출
+sel("ul > li#ca-nstab-main")    # ul 하위 태그중에 li 이고 id가 ca-nstab-main 인 데이터 추출
+sel("li[id='pt-anontalk']") # li태그중에 id='pt-anontalk' 데이터 추출
+sel("li:nth-of-type(4)")    # li태그중에 4번째 데이터 추출
+
+print(soup.select("li")[3].string)  # li태그중에 4번째 데이터 추출
+print(soup.find_all("li")[3].string)  # li태그중에 4번째 데이터 추출
+
+print(soup.select("#fr-list > li[data-lo='us']")[1].string) # id=fr-list 하위 li[data-lo='us'] 항목중에 2번째 데이터에서 문자추출
+print(soup.select("#fr-list > li.yellow")[0].string)    # id=fr-list 하위 class='yellow' 항목중에 1번째 항목의 데이터에서 문자추출
+
+cond = {"data-lo":"us", "class":"yellow"}   # data-li=us 항목이고 class=yellow 항목 데이터에서 선택
+print(soup.find("li", cond).string) # li 태그중에 cond 데이터에서 문자 추출
+
+print(soup.find(id="fr-list").find("li", cond).string)  # id=fr-list 를 검색한 데이터중에서 li 태그와 cond 데이터에서 문자추출
+
+- find 메서드는 객체를 사용해 여러 개의 조건을 한 번에 지정할 수 있다는 것이 특징이다.
+- find() 메서드를 연속으로 사용하면 이전에 추출한 요소에 추가적인 조건을 지정할수 있다.
+
+li = soup.find_all(href=re.compile(r"^https://"))   # href에 https:// 부분을 검색하여 속성값으로 정의한후 그 정의된 값으로 전체 탐색하여 변수에 저장
+for e in li:
+    print(e.attrs['href'])  # 속성값이 href에 정의된 속성값을 출력

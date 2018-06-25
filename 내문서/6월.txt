@@ -74,7 +74,7 @@ analysis_bchiken
 D:\PycharmProjects 물리적 환경
 C:\Users\BIT-USER\venv  가상 환경
 
-Github 등록 방법
+//Github 등록 방법
 
 [이클립스]
 Git Hub 에서 Repositories 에서 NEW 로 프로젝트 생성 -> 생성된 프로젝트 주소 복사 ->
@@ -90,6 +90,31 @@ Github 프로그램 다운,설치 -> 메뉴에서 VCS -> Import into Version Con
 -> Share Project On GitHub 창에서 Share 버튼 클릭 -> OK -> OK
 (변경사항 추가)
 프로젝트 소스 변경후 -> VCS -> Commit -> Commit Message 입력 -> 아래 Commit오른쪽 역삼각형 Commit and Push 클릭 -> Push 클릭
+
+
+//Github 가져오기
+
+[이클립스]
+File -> Import -> Git -> Projects from Git -> Clone URI (깃허브에서 프로젝트 경로 복사) -> Next -> Next ... -> 저장 경로 지정 -> 완료.
+
+[파이참]
+VCS -> Check out from ... -> Git -> 깃허브에서 프로젝트 경로 복사, 저장 경로 지정 -> 완료.
+
+
+
+//Github 수정,추가 파일 업로드
+
+[이클립스]
+Git Repositories 에서 우클릭 -> 해당 프로젝트 Commit -> Files 선택, Commit message 작성 -> Commit and Push -> 완료
+
+[파이참]
+VCS -> Commit -> Commit Message 작성 -> Commit and Push -> 완료
+
+
+//Github 수정,추가 파일 다운로드
+
+[이클립스]
+Git Repositories 에서 우클릭 -> 해당 프로젝트 Pull
 
 ===========================
 

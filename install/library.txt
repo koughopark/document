@@ -10,7 +10,7 @@
 
 오후 8:35	Packages installed successfully: Installed packages: 'simplejson'
 
-오후 11:42	Packages installed successfully: Installed packages: 'pandas'
+오후 11:42	Packages installed successfully: Installed packages: 'pandas'   # 파이썬이 뜨게 만든 라이브러리 + numpy
 
 오전 10:28	Packages installed successfully: Installed packages: 'scipy'
 

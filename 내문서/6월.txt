@@ -505,9 +505,61 @@ url 따는게 중요하다.
 >>> print(django.get_version())
 >>> Ctrl + Z (Enter) # 파이썬 나가기
 
-> django-admin startproject python_ch3 # python_ch3은 프로젝트 이름
+> django-admin startproject python_ch3      # python_ch3은 프로젝트 이름
 하면 프로젝트에 파일이 생성된다.
 디렉토리 한단계씩 위로 올리고 기존 디렉토리는 삭제
+
+views.py 에 코드 작성
+
+---------------------
+[emaillist/views.py]
+
+from django.shortcuts import render
+from emaillist.models import Emaillist
+from django.http import HttpResponseRedirect
+
+# Create your views here.
+
+def index(request):
+    emaillist_list = Emaillist.objects.all().order_by('-id')
+    data = {'emaillist_list':emaillist_list}
+    return render(request, 'index.html', data)
+
+def form(request):
+    return render(request, 'form.html')
+
+def add(request):
+    emaillist = Emaillist()
+    emaillist.first_name = request.POST['fn']
+    emaillist.last_name = request.POST['ln']
+    emaillist.email = request.POST['email']
+
+    emaillist.save()
+
+    return HttpResponseRedirect('/emaillist')
+
+-------------------------
+
+urls.py 에 코드 추가
+
+------------------
+
+[python_ch3/urls.py]
+
+from django.contrib import admin
+from django.urls import path
+
+from emaillist import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('emaillist/', views.index),
+    path('emaillist/form', views.form),
+    path('emaillist/add', views.add)
+
+---------------------
+
+
 
 > python manage.py startapp emaillist
 하면 프로젝트에 emaillist 파일 생성되고 하위 디렉토리에 migrations 디렉토리가 생성된다.
@@ -598,6 +650,7 @@ python manage.py createsuperuser    # admin에 접속하기 위해 유저를 만
 ppt 참조하여 settings.py 에 설정 변경
 
 mysqlclient 설치
+pip 설치 에러는 구글에서 검색하여 해결
 
 ppt 참조하여 python_ch2/settings.py 에 DB설정 변경
 

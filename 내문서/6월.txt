@@ -485,7 +485,10 @@ grant all privileges on djdb.* to 'djdb'@'localhost'; # djdb에 있는 데이터
 flush privileges;   # 반영시켜주라는 명령어(몇번)
 exit    # DB 나오기
 
+=========================================================
+
 CMD> mysql -u djdb -D djdb -p    # 대화식으로 하겠다.
+pass: djdb
 
 workbench 설치
 + 버튼 클릭
@@ -505,66 +508,38 @@ url 따는게 중요하다.
 >>> print(django.get_version())
 >>> Ctrl + Z (Enter) # 파이썬 나가기
 
-> django-admin startproject python_ch3      # python_ch3은 프로젝트 이름
+> django-admin startproject python_ch3      # python_ch3은 프로젝트 이름!!!!!!!!
 하면 프로젝트에 파일이 생성된다.
 디렉토리 한단계씩 위로 올리고 기존 디렉토리는 삭제
-
-views.py 에 코드 작성
-
----------------------
-[emaillist/views.py]
-
-from django.shortcuts import render
-from emaillist.models import Emaillist
-from django.http import HttpResponseRedirect
-
-# Create your views here.
-
-def index(request):
-    emaillist_list = Emaillist.objects.all().order_by('-id')
-    data = {'emaillist_list':emaillist_list}
-    return render(request, 'index.html', data)
-
-def form(request):
-    return render(request, 'form.html')
-
-def add(request):
-    emaillist = Emaillist()
-    emaillist.first_name = request.POST['fn']
-    emaillist.last_name = request.POST['ln']
-    emaillist.email = request.POST['email']
-
-    emaillist.save()
-
-    return HttpResponseRedirect('/emaillist')
-
--------------------------
-
-urls.py 에 코드 추가
-
-------------------
-
-[python_ch3/urls.py]
-
-from django.contrib import admin
-from django.urls import path
-
-from emaillist import views
-
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('emaillist/', views.index),
-    path('emaillist/form', views.form),
-    path('emaillist/add', views.add)
-
----------------------
-
 
 
 > python manage.py startapp emaillist
 하면 프로젝트에 emaillist 파일 생성되고 하위 디렉토리에 migrations 디렉토리가 생성된다.
 emaillist 디렉토리 하위 디렉토리에 templates 디렉토리 생성하고 form.html 과 index.html 파일을 복사해서 넣어준다.
+
+
+python manage.py makemigrations # migrations 디렉토리 있으면 pass
+
+python manage.py migrate
+
+python manage.py runserver 0.0.0.0:8000 # 서버실행
+[웹페이지에서]
+http://localhost:8000
+http://localhost:8000/admin/
+
+파이참에서 Ctrl + c 하면 어플리케이션(서버) 종료
+
+python manage.py createsuperuser    # admin에 접속하기 위해 유저를 만든다.
+
+ppt 39p. 40p. 참조하여 settings.py 에 설정 변경
+
+mysqlclient 설치
+pip 설치 에러는 구글에서 검색하여 해결
+
+ppt 참조하여 python_ch2/settings.py 에 DB설정 변경
+
 -------------------
+
 
 [form.html]
 
@@ -630,29 +605,73 @@ emaillist 디렉토리 하위 디렉토리에 templates 디렉토리 생성하�
 -------------------
 form.html 과 index.html 파일을 위와같이 수정한다.
 
-python manage.py runserver 0.0.0.0:8000 # 서버실행
 
-[웹페이지에서]
-http://localhost:8000/
-http://localhost:8000/admin
+views.py 에 코드 작성
 
-파이참에서 Ctrl + c 하면 어플리케이션(서버) 종료
+---------------------
+[emaillist/views.py]
 
-python manage.py makemigrations # migrations 디렉토리 있으면 pass
+from django.shortcuts import render
+from emaillist.models import Emaillist
+from django.http import HttpResponseRedirect
 
-python manage.py migrate
-웹페이지에서 서버 접속 테스트 해본다.
-http://localhost:8000
-http://localhost:8000/admin/
+# Create your views here.
 
-python manage.py createsuperuser    # admin에 접속하기 위해 유저를 만든다.
+def index(request):
+    emaillist_list = Emaillist.objects.all().order_by('-id')
+    data = {'emaillist_list':emaillist_list}
+    return render(request, 'index.html', data)
 
-ppt 참조하여 settings.py 에 설정 변경
+def form(request):
+    return render(request, 'form.html')
 
-mysqlclient 설치
-pip 설치 에러는 구글에서 검색하여 해결
+def add(request):
+    emaillist = Emaillist()
+    emaillist.first_name = request.POST['fn']
+    emaillist.last_name = request.POST['ln']
+    emaillist.email = request.POST['email']
 
-ppt 참조하여 python_ch2/settings.py 에 DB설정 변경
+    emaillist.save()
+
+    return HttpResponseRedirect('/emaillist')
+
+-------------------------
+
+urls.py 에 코드 추가
+
+------------------
+
+[python_ch3/urls.py]
+
+from django.contrib import admin
+from django.urls import path
+
+from emaillist import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('emaillist/', views.index),
+    path('emaillist/form', views.form),
+    path('emaillist/add', views.add)
+]
+
+---------------------
+
+models.py 에 코드 작성
+
+--------------------
+
+[emaillist/models.py]
+
+class Emaillist(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=50)
+    email = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "Emaillist(%s, %s, %s)" % (self.first_name, self.last_name, self.email)
+
+-----------------------
 
 > python manage.py migrate
 
@@ -660,7 +679,7 @@ ppt 참조하여 python_ch2/settings.py 에 DB설정 변경
 웹페이지에서 접속 테스트
 http://localhost:8000
 
-ppt 참조하여 emaillist/modes.py 에 코드 입력
+ppt 참조하여 emaillist/models.py 에 코드 입력    # 위에서 작성
 ppt 참조하여 emaillist/admin.py 에 코드 입력
 
 > python manage.py makemigrations

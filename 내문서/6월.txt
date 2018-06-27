@@ -398,6 +398,94 @@ GET방식 vs POST방식
 
 
 ========================================================================================================================
+6월 27일
+
+MVC 구조
+MVC FW(Model View Controller frame work) = MVC frame work (python, java ee, php)
+1. URL Mapping
+2. Parameter Value
+3. Database
+4. View (template, script)
+
+MVC는 패턴 (설계 패턴, 어플리케이션의 구조패턴)
+
+jango는 MVC로 되어있다
+jango를 안쓰는 데이터베이스는 한개도 없다.
+
+한가지 역할만 잘하는것이 객체 지향.
+
+Controller = request 에 대한 처리 -> 처리할 모델을 선택.
+
+MVC 구조는 유지보수가 쉽다.
+jango는 MVC와 약간 다르다.
+
+
+MySql 설치
+1. mysql-essential-5.1.44-winx64
+2. mysql-workbench-community-6.2.5-winx64
+
+DBMS (데이터 베이스 매니지먼트 시스템)
+외부에서 데이터에 접속할때 항상 DBMS를 통해서 작업한다.
+
+mysql 이 오라클에 인수된후 mysql에 있던 사람들이 나와서 MariaDB를 만들었다.
+처음에는 mysql -MariaDB가 호환되었다가 최근버전부터 호환되지 않는다.
+
+mysql 포트 : 3306
+
+1. DB생성
+2. 계정생성
+3. 권한부여
+
+
+DCL 데이타 C~ 랭귀지
+DDL 데이타 D~ 랭귀지
+DML 데이타 M~ 랭귀지
+
+jango는 사용자가 직접 쿼리를 날리지 않는다.
+최근 추세는 DB쿼리를 코드에 넣지 않는다.
+ORM(Object-Relation-Mapping) = 외국과 한국 대기업에서 사용
+Object = 객체지향
+Relation = RDB
+Object <-> Relation 상호간 부호화가 일어난다
+
+DA = 데이터 아키텍쳐 (설계)
+DBA = 데이터 관리
+DB App Dev = DA가 만들어준 쿼리를 가지고 화면을 만들어 준다.
+DA로 가던지 SWA로 가야된다.
+데이터가 좋아서 가는 사람들 DA
+소프트웨어가 좋아서 가는 사람들 SWA
+
+객체지향이 필요없다.
+Dao class 만들어서 CRUD 메소드로 데이터를 받아온다.
+
+ERD
+
+자바에서는 ORM이 잘 발달되어 있다.
+
+데이터베이스 이름:
+djdb - DB
+djdb - id
+djdb - password
+
+show databases;
+use mysql;
+show tables;
+desc user;
+create database djdb;
+create user 'djdb'@'localhost' identified by 'djdb';  # 로컬호스트에서만 돌게(윈도우에서만 돌게)
+--grant all privileges on *   # 모든 권한을 주겠다.
+grant all privileges on djdb.* to 'djdb'@'localhost'; # djdb에 있는 데이터베이스에있는 테이블에 있는 모든 권한을 주겠다.
+flush privileges;   # 반영시켜주라는 명령어(몇번)
+exit    # DB 나오기
+
+CMD> mysql -u djdb -D djdb -p    # 대화식으로 하겠다.
+
+workbench 설치
++ 버튼 클릭
+이름, 유저네임, 패스워드, 스키마 전체 djdb 로 입력
+
+
+
 ========================================================================================================================
 ========================================================================================================================
 ========================================================================================================================

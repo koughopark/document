@@ -347,7 +347,7 @@ url 입력
 
 알고리즘
 
-
+http://192.168.56.1:8088/index.html
 
 ========================================================================================================================
 6월 26일
@@ -467,6 +467,11 @@ djdb - DB
 djdb - id
 djdb - password
 
+
+
+CMD> mysql -u root -p
+password:
+
 show databases;
 use mysql;
 show tables;
@@ -484,6 +489,32 @@ workbench 설치
 + 버튼 클릭
 이름, 유저네임, 패스워드, 스키마 전체 djdb 로 입력
 
+리다이렉트는 주소를 갈아끼워주는 기능을 한다.
+
+view 가 가장 중요하다.
+
+url 따는게 중요하다.
+
+글로벌에 장고 설치하고 파이참 프로젝트에 옮긴후에 OPEN 하면 된다. (한단계씩 위로)
+
+python manage.py runserver 0.0.0.0:8000 # 서버실행
+
+[웹페이지에서]
+http://localhost:8000/
+http://localhost:8000/admin
+
+파이참에서 Ctrl + c 하면 어플리케이션(서버) 종료
+
+python manage.py createsuperuser
+
+python manage.py makemigrations
+
+python manage.py migrate
+
+view 제작
+1. /emaillist   # url 기억
+2. /emaillist/form  # 폼을 출력
+3. /emaillist/add   # 등록버튼 클릭
 
 
 ========================================================================================================================

@@ -517,7 +517,170 @@ view 제작
 3. /emaillist/add   # 등록버튼 클릭
 
 
+
 ========================================================================================================================
+6월 28일
+
+> python manage.py startapp guestbook
+하면 guestbook 디렉토리가 생성된다.
+
+urls.py 에서 guestbook 추가
+~ path('guestbook/', guestbook_views.index)
+이메일리스트와 게스트북 양쪽에 views가 중복되기 때문에
+from emaillist import views ->
+import emaillist.views as emaillist_views
+import guestbook.views as guestbook_views   # 이렇게 수정
+
+각각의 views.py 코드 작성
+return render(request, 'emaillist/index.html', data)
+return render(request, 'emaillist/form.html')
+[guestbook/views.py]
+def index(request):
+    return render(request, 'guestbook/index.html')
+
+templates 디렉토리 생성후 파일 복사.
+
+최상단에 templates 생성후 emaillist, guestbook 디렉토리 생성-> 기존 자료 복사
+
+각각의 views.py 에 리턴 경로 코드 수정
+return render(request, 'emaillist/index.html', data)
+return render(request, 'guestbook/index.html')
+
+settings.py 에 'DIRS': [os.path.join(BASE_DIR,'templates')], 코드 추가.
+
+삭제버튼을 누르면 deleteform으로 가야된다.
+/guestbook/delete
+
+------------------------
+
+[guestbook/models.py 코드 작성]
+
+class Guestbook(models.Model):
+    name = models.CharField(max_length=20)
+    password = models.CharField(max_length=20)
+    message = models.CharField(max_length=2000)
+    regdate = models.DateTimeField(auto_now=True)  #시간까지, 인서트 될때 지금시간을 넣는다.
+
+    def __str__(self):
+        return 'Guestbook(%s, %s, %s, %s) % (self.name, self.password, self.message, str(self.regdate))'
+
+----------------------------
+
+ [guestbook/admin.py 에서 코드 작성]
+
+ ------------------------
+
+from django.contrib import admin
+from guestbook.models import Guestbook
+
+# Register your models here.
+admin.site.register(Guestbook)
+
+ --------------------------
+
+python manage.py makemigrations
+하면 0001_initial.py 파일이 생성된다.
+python manage.py migrate
+하면 initial.py 파일이 실행된다.
+
+모델이 변경되면 위 2작업을 꼭 해준다.
+
+[guestbook/index.html 파일 변경]
+table 안쪽으로 한번 탭
+<form action="/guestbook/add" method="post">
+
+urls.py 수정
+path('guestbook/add', guestbook_views.add)
+
+
+----------------------
+guestbook/views.py 수정
+from django.shortcuts import render
+from django.http import HttpResponseRedirect
+from guestbook.models import Guestbook
+
+# Create your views here.
+
+def index(request):
+    return render(request, 'guestbook/index.html')
+
+def add(request):
+    guestbook = Guestbook()
+    guestbook.name = request.POST['name']   # index.html 에 저장된 이름 사용
+    guestbook.password = request.POST['password']
+    guestbook.message = request.POST['message']
+
+    guestbook.save()
+
+    return HttpResponseRedirect('/guestbook')
+
+========================
+guestbook/index.html 수정
+	<form method="post" action="">{% csrf_token %}
+
+-----------------
+guestbook/views.py 수정
+def index(request):
+    guestbook_list = Guestbook.objects.all().order_by('-regdate')
+
+    context = {'guestbook_list': guestbook_list}
+    return render(request, 'guestbook/index.html', context)
+
+-----------------
+Packages installed successfully: Installed packages: 'django-mathfilters' 설치
+settings INSTALLED_APPS 에 등록
+'mathfilters',
+
+
+---------------------------
+[guestbook/index.html 수정]
+
+{% load mathfilters %}
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>방명록</title>
+</head>
+<body>
+	<form action="/guestbook/add" method="post">{% csrf_token %}
+		<table border=1 width=500>
+			<tr>
+				<td>이름</td><td><input type="text" name="name"></td>
+				<td>비밀번호</td><td><input type="password" name="password"></td>
+			</tr>
+			<tr>
+				<td colspan=4><textarea name="message" cols=60 rows=5></textarea></td>
+			</tr>
+			<tr>
+				<td colspan=4 align=right><input type="submit" VALUE=" 확인 "></td>
+			</tr>
+		</table>
+	</form>
+	{% for guestbook in guestbook_list %}
+	<br>
+	<table width=510 border=1>
+		<tr>
+			<!--<td>[{{ guestbook.id}}]</td>-->
+			<td>{{ guestbook_list.count | add:1 | sub:forloop.counter }}</td> <!-- 전체 게시판 갯수 | +1 | 카운트-->
+			<td>{{ guestbook.name }}</td>
+			<td>{{ guestbook.regdate|date:'Y-m-d H:i:s' }}</td>
+			<td><a href="/guestbook/deleteform?id={{ guestbook.id}}">삭제</a></td>
+		</tr>
+		<tr>
+			<td colspan=4>
+				{{ guestbook.message|linebreaksbr }}
+			</td>
+		</tr>
+	</table>
+	{% endfor  %}
+</body>
+</html>
+
+----------------------
+
+
+
+
 ========================================================================================================================
 ========================================================================================================================
 ========================================================================================================================

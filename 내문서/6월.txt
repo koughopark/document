@@ -422,7 +422,9 @@ jango는 MVC와 약간 다르다.
 
 MySql 설치
 1. mysql-essential-5.1.44-winx64
-2. mysql-workbench-community-6.2.5-winx64
+2. mysql-workbench-community-6.2.5-winx64   # 아래 workbench 설치에서 설치
+
+ID: manager
 
 DBMS (데이터 베이스 매니지먼트 시스템)
 외부에서 데이터에 접속할때 항상 DBMS를 통해서 작업한다.
@@ -468,9 +470,9 @@ djdb - id
 djdb - password
 
 
-
+# DB 접속
 CMD> mysql -u root -p
-password:
+password: (manager)
 
 show databases;
 use mysql;
@@ -483,7 +485,10 @@ grant all privileges on djdb.* to 'djdb'@'localhost'; # djdb에 있는 데이터
 flush privileges;   # 반영시켜주라는 명령어(몇번)
 exit    # DB 나오기
 
+=========================================================
+
 CMD> mysql -u djdb -D djdb -p    # 대화식으로 하겠다.
+pass: djdb
 
 workbench 설치
 + 버튼 클릭
@@ -497,19 +502,197 @@ url 따는게 중요하다.
 
 글로벌에 장고 설치하고 파이참 프로젝트에 옮긴후에 OPEN 하면 된다. (한단계씩 위로)
 
-python manage.py runserver 0.0.0.0:8000 # 서버실행
+파이참 터미널에서
+> python
+>>> import django
+>>> print(django.get_version())
+>>> Ctrl + Z (Enter) # 파이썬 나가기
 
+> django-admin startproject python_ch3      # python_ch3은 프로젝트 이름!!!!!!!!
+하면 프로젝트에 파일이 생성된다.
+디렉토리 한단계씩 위로 올리고 기존 디렉토리는 삭제
+
+
+> python manage.py startapp emaillist
+하면 프로젝트에 emaillist 파일 생성되고 하위 디렉토리에 migrations 디렉토리가 생성된다.
+emaillist 디렉토리 하위 디렉토리에 templates 디렉토리 생성하고 form.html 과 index.html 파일을 복사해서 넣어준다.
+
+
+python manage.py makemigrations # migrations 디렉토리 있으면 pass
+
+python manage.py migrate
+
+python manage.py runserver 0.0.0.0:8000 # 서버실행
 [웹페이지에서]
-http://localhost:8000/
-http://localhost:8000/admin
+http://localhost:8000
+http://localhost:8000/admin/
 
 파이참에서 Ctrl + c 하면 어플리케이션(서버) 종료
 
-python manage.py createsuperuser
+python manage.py createsuperuser    # admin에 접속하기 위해 유저를 만든다.
 
-python manage.py makemigrations
+ppt 39p. 40p. 참조하여 settings.py 에 설정 변경
 
-python manage.py migrate
+mysqlclient 설치
+pip 설치 에러는 구글에서 검색하여 해결
+
+ppt 참조하여 python_ch2/settings.py 에 DB설정 변경
+
+-------------------
+
+
+[form.html]
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>메일 리스트 가입</h1>
+	<p>
+		메일 리스트에 가입하려면,<br>
+		아래 항목을 기입하고 submit 버튼을 클릭하세요.
+	</p>
+	<form action="/emaillist/add" method="post">{% csrf_token %}
+	    First name: <input type="text" name="fn" value="" ><br>
+	    Last name: <input type="text" name="ln" value=""><br>
+	    Email address: <input type="text" name="email" value=""><br>
+	    <input type="submit" value="submit">
+	</form>
+	<br>
+	<p>
+	<a href="/emaillist">리스트 바로가기</a>
+	</p>
+</body>
+</html>
+-----------
+
+[index.html]
+
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+</head>
+<body>
+	<h1>메일 리스트에 가입되었습니다.</h1>
+	<p>입력한 정보 내역입니다.</p>
+	<!-- 메일정보 리스트 -->
+	{% for emaillist in emaillist_list %}
+	<table border="1" cellpadding="5" cellspacing="2">
+		<tr>
+			<td align=right>First name: </td>
+			<td>{{ emaillist.first_name }}</td>
+		</tr>
+		<tr>
+			<td align=right width="110">Last name: </td>
+			<td width="110">{{ emaillist.last_name }}</td>
+		</tr>
+		<tr>
+			<td align=right>Email address: </td>
+			<td>{{ emaillist.email }}</td>
+		</tr>
+	</table>
+	<br>
+	{% endfor %}
+	<p>
+		<a href="/emaillist/form">추가메일 등록</a>
+	</p>
+	<br>
+</body>
+</html>
+-------------------
+form.html 과 index.html 파일을 위와같이 수정한다.
+
+
+views.py 에 코드 작성
+
+---------------------
+[emaillist/views.py]
+
+from django.shortcuts import render
+from emaillist.models import Emaillist
+from django.http import HttpResponseRedirect
+
+# Create your views here.
+
+def index(request):
+    emaillist_list = Emaillist.objects.all().order_by('-id')
+    data = {'emaillist_list':emaillist_list}
+    return render(request, 'index.html', data)
+
+def form(request):
+    return render(request, 'form.html')
+
+def add(request):
+    emaillist = Emaillist()
+    emaillist.first_name = request.POST['fn']
+    emaillist.last_name = request.POST['ln']
+    emaillist.email = request.POST['email']
+
+    emaillist.save()
+
+    return HttpResponseRedirect('/emaillist')
+
+-------------------------
+
+urls.py 에 코드 추가
+
+------------------
+
+[python_ch3/urls.py]
+
+from django.contrib import admin
+from django.urls import path
+
+from emaillist import views
+
+urlpatterns = [
+    path('admin/', admin.site.urls),
+    path('emaillist/', views.index),
+    path('emaillist/form', views.form),
+    path('emaillist/add', views.add)
+]
+
+---------------------
+
+models.py 에 코드 작성
+
+--------------------
+
+[emaillist/models.py]
+
+class Emaillist(models.Model):
+    first_name = models.CharField(max_length=100)
+    last_name = models.CharField(max_length=50)
+    email = models.CharField(max_length=200)
+
+    def __str__(self):
+        return "Emaillist(%s, %s, %s)" % (self.first_name, self.last_name, self.email)
+
+-----------------------
+
+> python manage.py migrate
+
+> python manage.py runserver 0.0.0.0:8000
+웹페이지에서 접속 테스트
+http://localhost:8000
+
+ppt 참조하여 emaillist/models.py 에 코드 입력    # 위에서 작성
+ppt 참조하여 emaillist/admin.py 에 코드 입력
+
+> python manage.py makemigrations
+> python manage.py migrate
+하면 DB에 emaillist_emaillist 테이블이 생성된다.
+
+> python manage.py runserver 0.0.0.0:8000
+웹페이지에서 접속 테스트
+http://localhost:8000/emaillist
+
+웹페이지에서 이메일 정보 등록후 workbench(DB) 에서
+select * from emaillist_emaillist order by id desc;
+명령어로 DB 등록 확인
 
 view 제작
 1. /emaillist   # url 기억

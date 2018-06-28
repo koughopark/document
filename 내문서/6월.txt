@@ -448,7 +448,7 @@ jango는 사용자가 직접 쿼리를 날리지 않는다.
 ORM(Object-Relation-Mapping) = 외국과 한국 대기업에서 사용
 Object = 객체지향
 Relation = RDB
-Object <-> Relation 상호간 부호화가 일어난다
+Object <-> Relation 상호간 부조화가 일어난다
 
 DA = 데이터 아키텍쳐 (설계)
 DBA = 데이터 관리

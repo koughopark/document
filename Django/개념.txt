@@ -76,3 +76,55 @@ urlpatterns = [
     url(r'^$', views.post_list, name='post_list'),  # 이 패턴은 장고에게 누군가 웹사이트에 'http://127.0.0.1:8000/' 주소로 들어왔을 때 views.post_list를 보여준다
 ]
 
+뷰(view) 는 애플리케이션의 "로직"을 넣는 곳이다.
+뷰는 이전 장에서 만들었던 모델에서 필요한 정보를 받아와서 템플릿에 전달하는 역할을 한다.
+
+post_list라는 함수(def) 만들어 요청(request)을 넘겨받아 render메서드를 호출합니다. 이 함수는 호출하여 받은(return) blog/post_list.html템플릿을 보여준다.
+
+템플릿 파일에 모든 내용이 저장된다.
+
+(왜 똑같은 blog디렉토리를 하나 더 만들어야하는지 궁금할 거에요. 나중에 알게 되겠지만, 나중에 폴더 구조가 복잡해 질 때 좀더 쉽게 찾기 위해 사용하는 관습적인 방법이랍니다)
+
+각 HTML 페이지는 두 가지 요소, head와 body로 구분됩니다.
+head 는 문서 정보를 가지고 있지만, 웹 페이지에서 보이지 않는 정보들을 담는 영역입니다.
+body 란 웹 페이지에 직접적으로 보이는 내용이 들어갑니다. 웹 페이지의 내용은 모두 이 body태그안에 들어갑니다.
+<head>는 브라우저에 페이지에 대한 설정들을 알려주고, <body>는 실제 페이지에 보여줄 내용을 알려줍니다.
+
+<h1>A heading</h1> - 큰 제목
+<h2>A sub-heading</h2> - 중 제목
+<h3>A sub-sub-heading</h3> - 소 제목... <h6>레벨까지 사용할 수 있습니다.
+<em>text</em> - 텍스트 기울기 (Italic)
+<strong>text</strong> - 텍스트를 두껍게(Bold)
+<br /> - 줄바꿈 (br은 스스로 닫히는 태그로 속성을 사용할 수 없습니다)
+<a href="http://djangogirls.org">link</a> - 하이퍼링크 걸기
+<ul><li>first item</li><li>second item</li></ul>- 목록 만들기
+<div></div> - 페이지 섹션
+
+ (test)라는 사용자가 작성한 모든 글을 찾고 싶다고 해볼게요. 이런 경우 Post.objects.all()에서 all대신, filter를 사용합니다.
+모든 글들 중, 제목(title)에 'title'이라는 글자가 들어간 글들만을 뽑아내서 보고 싶다면?
+
+command-line
+>>> Post.objects.filter(title__contains='title')
+[<Post: Sample title>, <Post: 4th title of post>]
+title와 contains 사이에 있는 밑줄(_)이 2개(__)입니다. 장고 ORM은 필드 이름("title")과 연산자과 필터("contains")를 밑줄 2개를 사용해 구분합니다. 밑줄 1개만 입력한다면, FieldError: Cannot resolve keyword title_contains라는 오류가 뜰 거예요.
+
+정렬
+Post.objects.order_by('created_date')   # 오름차순
+Post.objects.order_by('-created_date')  # 내림차순
+
+쿼리셋 연결하기
+쿼리셋들을 함께 연결(chaining)할 수 있어요.
+command-line
+>>> Post.objects.filter(published_date__lte=timezone.now()).order_by('published_date')
+이 방법은 정말 강력해 복잡한 쿼리도 작성할 수 있게 해준답니다.
+좋아요! 이제 다음 내용으로 넘어갈 때로군요! 다음 명령을 입력해, 쉘을 종료하세요. :
+command-line
+>>> exit()
+$
+
+
+뷰(view)는 모델과 템플릿을 연결하는 역할을 합니다. post_list를 뷰에서 보여주고 이를 템플릿에 전달하기 위해서는, 모델을 가져와야 합니다.
+일반적으로 뷰가 템플릿에서 모델을 선택하도록 만들어야 합니다.
+Post모델에서 블로그 글을 가져오기 위해서는 쿼리셋(QuerySet)이 필요합니다.
+
+

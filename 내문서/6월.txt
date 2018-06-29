@@ -1040,6 +1040,562 @@ settings.py -> urls.py -> views.py ->
 
 
 ========================================================================================================================
+6월 29일
+
+템플릿 상송
+
+templates 에 base.html 파일 만듬
+main/ index.html 복사해서 붙여넣기
+========================================
+[main/ base.html 코드 작성]
+<!DOCTYPE html>
+<html>
+<head>
+<title>mysite</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link href="/assets/css/main.css" rel="stylesheet" type="text/css">
+{% block css_link %}{% endblock %}
+</head>
+<body>
+	<div id="container">
+		<div id="header">
+			<h1>MySite</h1>
+			<ul>
+				<li><a href="/user/login">로그인</a><li>
+				<li><a href="/user/join">회원가입</a><li>
+				<li><a href="/user/modify">회원정보수정</a><li>
+				<li><a href="/user/logout">로그아웃</a><li>
+				<li>님 안녕하세요 ^^;</li>
+			</ul>
+		</div>
+		<div id="wrapper">
+			<div id="content">
+                {% block content %}
+                {% endblock %}
+			</div>
+		</div>
+		<div id="navigation">
+			<ul>
+				<li><a href="/">안대혁</a></li>
+				<li><a href="/guestbook">방명록</a></li>
+				<li><a href="/board">게시판</a></li>
+			</ul>
+		</div>
+		<div id="footer">
+			<p>(c)opyright 2015, 2016, 2017, 2018</p>
+		</div>
+	</div>
+</body>
+</html>
+==================================
+
+[main/ index.html 수정]
+
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/main.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+<div id="site-introduction">
+	<img id="profile" src="https://scontent-icn1-1.xx.fbcdn.net/v/t1.0-1/p240x240/30705531_2083087868372808_5261052926483232647_n.jpg?_nc_cat=0&oh=db97a9950eade94d765d2b566ff92fbc&oe=5BE17354">
+	<h2>안녕하세요. 안대혁의  mysite에 오신 것을 환영합니다.</h2>
+	<p>
+		이 사이트는  웹 프로그램밍 실습과제 예제 사이트입니다.<br>
+		메뉴는  사이트 소개, 방명록, 게시판이 있구요. Python 수업 + 데이터베이스 수업 + 웹프로그래밍 수업 배운 거 있는거 없는 거 다 합쳐서
+		만들어 놓은 사이트 입니다.<br><br>
+		<a href="/guestbook">방명록</a>에 글 남기기<br>
+	</p>
+</div>
+{% endblock %}
+
+==========================================
+
+[templates/user/joinform.html, joinsuccess.html, loginform.html] 수정
+
+[joinform.html]
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/user.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="user">
+
+				<form id="join-form" name="joinForm" method="" action="">
+					<label class="block-label" for="name">이름</label>
+					<input id="name" name="name" type="text" value="">
+
+					<label class="block-label" for="email">이메일</label>
+					<input id="email" name="email" type="text" value="">
+					<input type="button" value="id 중복체크">
+
+					<label class="block-label">패스워드</label>
+					<input name="password" type="password" value="">
+
+					<fieldset>
+						<legend>성별</legend>
+						<label>여</label> <input type="radio" name="gender" value="female" checked="checked">
+						<label>남</label> <input type="radio" name="gender" value="male">
+					</fieldset>
+
+					<fieldset>
+						<legend>약관동의</legend>
+						<input id="agree-prov" type="checkbox" name="agreeProv" value="y">
+						<label>서비스 약관에 동의합니다.</label>
+					</fieldset>
+
+					<input type="submit" value="가입하기">
+
+				</form>
+			</div>
+{% endblock %}
+====================
+[joinsuccess.html
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/user.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="user">
+				<p class="jr-success">
+					회원가입을 축하합니다.
+					<br><br>
+					<a href="/user?a=loginform">로그인하기</a>
+				</p>
+			</div>
+{% endblock %}
+
+
+===============================
+[loginform.html]
+
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/user.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="user">
+				<form id="login-form" name="loginform" method="post" action="/user?a=login">
+					<label class="block-label" for="email">이메일</label>
+					<input id="email" name="email" type="text" value="">
+					<label class="block-label" >패스워드</label>
+					<input name="password" type="password" value="">
+					<p>
+						로그인이 실패 했습니다.
+					</p>
+					<input type="submit" value="로그인">
+				</form>
+			</div>
+{% endblock %}
+
+=================================
+
+[mysite/settings.py 수정]
+...
+		<div id="header">
+			<h1>MySite</h1>
+			<ul>
+				<li><a href="/user/loginform">로그인</a><li>
+				<li><a href="/user/joinform">회원가입</a><li>
+				<li><a href="/user/modifyform">회원정보수정</a><li>
+				<li><a href="/user/logout">로그아웃</a><li>
+				<li>님 안녕하세요 ^^;</li>
+			</ul>
+		</div>
+...
+=================================
+
+URL부터 따야 된다.
+1. /user/joinform
+
+====================================
+
+유저 어플리케이션 만들기
+python manage.py startapp user
+
+mysite/setting.py 수정
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'main',
+    'guestbook',
+    'user',
+]
+
+python manage.py makemigrations
+python manage.py migrate
+=========================
+
+
+[mysite/urls.py 추가]
+
+import user.views as user_views
+
+urlpatterns = [
+    path('', main_views.index),
+    path('user/joinform/', user_views.joinform),
+    path('admin/', admin.site.urls),
+]
+========================
+
+'DIRS': [os.path.join(BASE_DIR,'templates')],   # 템플릿은 여기를 기준으로 해라
+
+[user/views.py 코드 작성]
+
+from django.shortcuts import render
+
+# Create your views here.
+
+def joinform(request):
+    return render(request, 'user/joinform.html')
+
+=================================
+
+서버 테스트
+
+[urls.py 수정]
+
+from django.contrib import admin
+from django.urls import path
+
+import main.views as main_views
+import user.views as user_views
+
+urlpatterns = [
+    path('', main_views.index),
+    path('user/joinform/', user_views.joinform),
+    path('user/joinsuccess/', user_views.joinsuccess),
+    path('admin/', admin.site.urls),
+]
+
+
+==================
+
+[user/views.py 수정]
+
+from django.shortcuts import render
+
+# Create your views here.
+
+def joinform(request):
+    return render(request, 'user/joinform.html')
+
+def joinsuccess(request):
+    return render(request, 'user/joinsuccess.html')
+
+    ===================
+
+[joinsuccess.html 수정]
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/user.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="user">
+				<p class="jr-success">
+					회원가입을 축하합니다.
+					<br><br>
+					<a href="/user/loginform">로그인하기</a>
+				</p>
+			</div>
+{% endblock %}
+
+
+======================================
+
+[joinform.html 수정]
+
+
+			<div id="user">
+
+				<form id="join-form" name="joinForm" method="post" action="/user/join"> <==
+					<label class="block-label" for="name">이름</label>
+
+
+============================
+
+Alt + Enter = 임포트
+
+===========================
+
+[urls.py 수정]
+
+from django.contrib import admin
+from django.urls import path
+
+import main.views as main_views
+import user.views as user_views
+
+urlpatterns = [
+    path('', main_views.index),
+    path('user/joinform/', user_views.joinform),
+    path('user/join//', user_views.join),
+    path('user/joinsuccess/', user_views.joinsuccess),
+    path('admin/', admin.site.urls),
+]
+
+========================
+
+[user/views.py 수정]
+
+from django.http import HttpResponseRedirect
+from django.shortcuts import render
+
+# Create your views here.
+from user.models import User
+
+
+def joinform(request):
+    return render(request, 'user/joinform.html')
+
+def joinsuccess(request):
+    return render(request, 'user/joinsuccess.html')
+
+def join(request):
+    user = User()
+    user.name = request.POST['name']
+    user.email = request.POST['email']
+    user.password = request.POST['password']
+    user.gender = request.POST['gender']
+
+    user.save()
+
+    return HttpResponseRedirect('user/joinsuccess')
+
+==========================
+
+서버 테스트
+-> 런타임 오류
+
+=======================
+
+html 에 {% csrf_token %} 추가
+
+==================
+
+[urls.py 수정]
+from django.contrib import admin
+from django.urls import path
+
+import main.views as main_views
+import user.views as user_views
+
+urlpatterns = [
+    path('', main_views.index),
+    path('user/joinform/', user_views.joinform),
+    path('user/join', user_views.join),     <-
+    path('user/joinsuccess/', user_views.joinsuccess),
+    path('admin/', admin.site.urls),
+]
+
+===================
+urls.py
+path('user/loginform/', user_views.loginform),
+
+user/views.py
+def loginform(request):
+    return render(request, 'user/loginform.html')
+
+urls.py
+path('user/login', user_views.login),
+
+user/views.py
+=======================================
+
+def login(request):
+    result = User.objects.filter(email=request.POST['email']).filter(password=request.POST['password']) # 한개가 아니라 리스트 비슷하게 들어온다. 리스트가 비어있으면 에러가 난다.
+
+    # 로그인 실패
+    if len(result) == 0:
+        return HttpResponseRedirect('/user/loginform?result=false')
+
+    # 로그인 처리
+    authuser = result[0]
+    request.session['authuser'] = model_to_dict(authuser)  # 인증처리
+    # return HttpResponse('hello world')  # 텍스트를 출력하고 싶을때 /hello world 출력됨
+    return HttpResponseRedirect('/')
+
+======================================
+[loginform.html]
+{% extends "../base.html" %} <!--상속받는다는 표시-->
+
+{% block css_link %}
+<link href="/assets/css/user.css" rel="stylesheet" type="text/css">
+{% endblock %}
+
+{% block content %}
+			<div id="user">
+				<form id="login-form" name="loginform" method="post" action="/user?a=login">{% csrf_token %}
+					<label class="block-label" for="email">이메일</label>
+					<input id="email" name="email" type="text" value="">
+					<label class="block-label" >패스워드</label>
+					<input name="password" type="password" value="">
+					<!--if-->
+					{% if request.GET.result == 'false' %}
+					<p>
+						로그인이 실패 했습니다.
+					</p>
+					{% endif %}
+					<input type="submit" value="로그인">
+				</form>
+			</div>
+{% endblock %}
+
+
+=================
+
+[base.html]
+
+<!DOCTYPE html>
+<html>
+<head>
+<title>mysite</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<link href="/assets/css/main.css" rel="stylesheet" type="text/css">
+{% block css_link %}{% endblock %}
+</head>
+<body>
+	<div id="container">
+		<div id="header">
+			<h1>MySite</h1>
+			<ul>
+				{% if request.session.authuser is None %}
+					<li><a href="/user/loginform">로그인</a><li>
+					<li><a href="/user/joinform">회원가입</a><li>
+				{% else %}
+					<li><a href="/user/modifyform">회원정보수정</a><li>
+					<li><a href="/user/logout">로그아웃</a><li>
+					<li>{{ request.session.authuser.name }}님 안녕하세요 ^^;</li>
+				{% endif %}
+			</ul>
+		</div>
+		<div id="wrapper">
+			<div id="content">
+                {% block content %}
+                {% endblock %}
+			</div>
+		</div>
+		<div id="navigation">
+			<ul>
+				<li><a href="/">안대혁</a></li>
+				<li><a href="/guestbook">방명록</a></li>
+				<li><a href="/board">게시판</a></li>
+			</ul>
+		</div>
+		<div id="footer">
+			<p>(c)opyright 2015, 2016, 2017, 2018</p>
+		</div>
+	</div>
+</body>
+</html>
+
+=================================
+
+[settings.py] 하단 추가
+
+# session
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+================================
+
+[로그아웃 처리]
+
+urls.py 추가
+
+path('user/logout', user_views.logout),
+
+================
+user/views.py 추가
+
+def logout(request):
+    del request.session['authuser']
+    return HttpResponseRedirect('/')
+
+===============================
+html if else 문법
+				{% if request.session.authuser is None %}
+					<li><a href="/user/loginform">로그인</a><li>
+					<li><a href="/user/joinform">회원가입</a><li>
+				{% else %}
+					<li><a href="/user/modifyform">회원정보수정</a><li>
+					<li><a href="/user/logout">로그아웃</a><li>
+					<li>{{ request.session.authuser.name }}님 안녕하세요 ^^;</li>
+				{% endif %}
+
+=======================
+
+python manage.py startapp board
+
+setting.py 추가
+
+board/views.py 코드 작성
+
+def writeform(request):
+    # 인증 체크
+    if request.session['authuser'] is None:
+        return HttpResponseRedirect('/user/loginform')
+
+
+==================================
+
+[board/models.py]
+
+from django.db import models
+
+# Create your models here.
+from user.models import User
+
+
+class Board(models.Model):
+    title = models.CharField(max_length=200)
+    content = models.CharField(max_length=2000)
+    hit = models.IntegerField(default=0)
+    regdate = models.DateTimeField
+    user = models.ForeignKey(User, on_delete=models.CASCADE)  # 보드에 정보를 가져오면 유저에 세팅된다 / on_deleete= 유저가 삭제되었을때 나는 어떻게 할것인가 / 유저가 삭제되었을때 글도 다 같이 지워준다. RDB
+
+
+    def __str__(self):
+        return "Board(%s, %s, %d, %s, %d)" % (
+            self.title,
+            self.content,
+            self.hit,
+            str(self.regdate),
+            self.user.id)
+
+    ===================================
+
+[board/admin.py]
+모델 등록
+
+from board.models import Board
+# Register your models here.
+admin.register(Board)
+
+=======================
+
+python manage.py makemigrations
+python manage.py migrate
+
+=======================
+
+<h1> 제목
+<p> 소제목
+<form action="/emaillist/add" method="post">{% csrf_token %}    action = 경로에 있는 함수 실행, post 형식으로.
+</form>
+
 ========================================================================================================================
 ========================================================================================================================
 ========================================================================================================================

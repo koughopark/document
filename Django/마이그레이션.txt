@@ -1,0 +1,25 @@
+마이그레이션은 단순하게 서비스 중인 한 어플리케이션 또는 모듈 등을 전혀 다른 환경(OS, 미들웨어, 하드웨어 등)
+에서도 돌아갈 수 있도록 전환하는 것을 의미합니다...
+
+사전 상 의미는 A라는 곳에서 B라는 곳으로 옮겨가는 과정을 뜻한다고 하네요.
+
+보통 개발자 입장에서 바라보는 통념상의 마이그레이션은 대부분 데이터의 전환이나 이행등을 말하는 것 같습니다.
+
+예를들어 A시스템의 데이터를 B시스템으로 전부 옮기는 것, 또는 오라클 DB를 사이베이스 DB로 옮긴다던가... 등등이 있을 것 같습니다.
+
+이제, migrate 를 실행시켜 데이터베이스에 모델과 관련된 테이블을 생성해봅시다.
+
+스캔해서 변경된 부분이 있으면 모델을 만들어 준다.
+그후 migrate 로 DB에 반영한다.
+
+no changed 나오면 다음
+
+python manage.py showmigrations
+위와 같이 명령하면 프로젝트 안에 앱들의 마이그레이션 히스토리를 볼 수 있다.
+
+python manage.py makemigrations
+python manage.py showmigrations
+python manage.py migrate --fake 프로젝트_앱 zero
+마이그레이션 파일 삭제
+python manage.py makemigrations
+python manage.py migrate --fake-initial

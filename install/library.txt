@@ -16,4 +16,8 @@
 
 오후 3:36	Packages installed successfully: Installed packages: 'beautifulsoup4'
 
+오후 6:47	Packages installed successfully: Installed packages: 'Django'
+
 오전 11:27	Packages installed successfully: Installed packages: 'django-mathfilters'
+
+pip install mysqlclient==1.3.12

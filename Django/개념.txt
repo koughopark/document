@@ -76,3 +76,30 @@ urlpatterns = [
     url(r'^$', views.post_list, name='post_list'),  # 이 패턴은 장고에게 누군가 웹사이트에 'http://127.0.0.1:8000/' 주소로 들어왔을 때 views.post_list를 보여준다
 ]
 
+====================================================
+
+
+render 함수는 request 객체를 첫번째 인자로, 템플릿 이름을 두번째 인자로 받습니다. 그리고 세번째 인자는 선택적으로써, 템플릿에 전달할 딕셔너리입니다.
+render() 함수는 주어진 템플릿과 딕셔너리로 렌더링된 결과를 HttpResponse 객체로 리턴합니다.
+
+render함수에는 매개변수 request(사용자가 요청하는 모든 것)와 'blog/post_list.html' 템플릿이 있습니다.
+{}이 보일 텐데, 이곳에 템플릿을 사용하기 위해 매개변수를 추가할 거에요. (이 매개변수를'posts'라고 할거에요){'posts': posts}이렇게 작성할거에요.
+:이전에 문자열이 와야하고, 작은 따옴표''를 양쪽에 붙이는 것을 잊지 마세요.
+
+render
+render()함수는 django.shortcuts 패키지에 포함되어 있는 도우미 함수입니다.
+동적으로 template을 이용하여 html을 생성한 후 httpResponse에 포함해 반환해줍니다.
+request와 템플릿파일명 이 필수 인자입니다.
+
+
+MVC 패턴
+MVC 패턴(Model View Controller Pattern)
+조율, 데이터, 화면으로 프로그램을 구성하는 방식
+
+Model(데이터) - models.py
+Candidate 클래스의 형식대로 데이터를 DB에 저장, 불러옴
+View(화면) - templates
+화면에 어떤 장면을 보여줄지를 결정
+Controller(조율) - views.py
+Candidate 모델에서 데이터를 읽어, index.html에 전달
+

@@ -103,3 +103,76 @@ View(화면) - templates
 Controller(조율) - views.py
 Candidate 모델에서 데이터를 읽어, index.html에 전달
 
+-------------------------------------------
+result['start_date'] = poll.start_date      # 다른곳에 정의된 result 딕셔너리
+
+   {% for result in poll_results %}
+    <tr>
+        <td> {{result.start_date.year}} </td>       # 위의 딕셔너리를 html에서 사용할때 이렇게 작성한다.
+        <td> 후보1 지지율</td>
+        <td> 후보2 지지율</td>
+    </tr>
+    {% endfor %}
+
+--------------------------------------
+
+def candidates(request, name):
+    candidate = get_object_or_404(Candidate, name = name)    # 오브젝트를 가져오거나 아니면 404를 발생시켜라 라는 의미
+    # try:
+    #     candidate = Candidate.objects.get(name = name)  # url이 저장되어있지 않으면 이부분에서 불러올수 없기때문에 에러난다.
+    # except:
+    #     # return HttpResponseNotFound("없는 페이지 입니다.")
+    #     raise Http404
+    return HttpResponse(candidate.name)
+
+예외처리 3가지 방법
+1. return HttpResponseNotFound("없는 페이지 입니다.")
+2. raise Http404
+3. candidate = get_object_or_404(Candidate, name = name)
+
+--------------------------------------
+
+404 페이지 변경하려면 setting.py 에서 아래처럼 설정 변경
+
+DEBUG = False
+
+ALLOWED_HOSTS = ['localhost']   # 접속 주소
+
+최상위에 templates 디렉토리 생성후
+
+다시 settings 에서 아래처럼 수정
+
+'DIRS': ['templates'],
+
+--- 다른 디렉토리의 templates 파일에 접근할수 있었던 이유는
+'APP_DIRS': True, 였기 때문이다.
+
+--------------------------------------
+html에서 다른 html 파일을 상속 할때 사용
+최상단
+{% extends "elections/layout.html" %}   # layout.html 파일에 코드를 넣어준다.
+
+--------------------------------
+<body>
+<nav class="navbar navbar-default">
+  <div class="container-fluid">
+    <div class="navbar-header">
+      <a class="navbar-brand" href="#">사이트명</a>
+    </div>
+</nav>
+
+네비게이션 바는 화면 상단에 공통적으로 유지되는 화면
+<body> 바로 아래 넣어준다.
+공통으로 사용하는 html 파일에 넣어준다.
+----------------------------------
+    # urls.py 작성
+path('', ev.index, name = 'home'),
+
+  # elections에 home 이라는 이름을 가진 url을 가져와서 사용하게 된다.
+<a class="navbar-brand" href="{% url 'elections:home' %}">사이트명</a>
+
+-------------------------------------------
+
+장고가 파일을 접근하는 방법은 각 app 별로 static 이라는 폴더를 찾아보고
+그안에 있는 파일을들 한군데 모아서 관리한다.
+그래서 static 이라는 폴더를 만들어야 하고 그 폴더안에 각각의 app 이름을 가지는 폴더를 만들어야 한다.

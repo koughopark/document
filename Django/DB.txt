@@ -1,0 +1,27 @@
+1. CMD 에서 DB만들기
+# DB 접속
+CMD> mysql -u root -p
+password: (manager)
+
+show databases;
+use mysql;
+show tables;
+desc user;
+create database djdb;
+create user 'djdb'@'localhost' identified by 'djdb';  # 로컬호스트에서만 돌게(윈도우에서만 돌게)
+--grant all privileges on *   # 모든 권한을 주겠다.
+grant all privileges on djdb.* to 'djdb'@'localhost'; # djdb에 있는 데이터베이스에있는 테이블에 있는 모든 권한을 주겠다.
+flush privileges;   # 반영시켜주라는 명령어(몇번)
+exit    # DB 나오기
+
+CMD> mysql -u djdb -D djdb -p    # 대화식으로 하겠다.
+pass: djdb
+
+
+2. workbench 연결
+
+3. models.py 에서 DB형식 지정
+
+4. makemigrations 으로 DB설계도 만들기
+
+5. migrate로 실제 DB와 연결

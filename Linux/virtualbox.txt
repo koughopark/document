@@ -1,0 +1,37 @@
+환경설정
+새로만들기
+동적할당
+만들고 난후 네트워크 설정에서
+어탭터에 브리지 선택(하나의 컴퓨터로 2개처럼 사용할수 있게 해준다. 내부망으로 구성)
+광학드라이브 인서트
+시작
+skip
+호스트명: lx01.hadoop.com
+루트 password : manager
+사용자 레이아웃 만들기 선택
+만들기-> 표준파티션 -> 생성->마운트 지점: /boot, 용량: 512
+만들기 ... -> 파일시스템 유형:swap , 용량 : 2048
+만들기 ... -> 마운트 지점: /, 용량: 가능한 최대 용량으로 채움 선택
+다음.. 포맷..
+
+로그인
+id: root
+pass : manager
+
+# ifconfig -a
+# cd /etc
+# cd sysconfig
+# cd network-scripts
+# pwd
+# ls
+# vi ifcfg-eth0
+insert 누르고 OnBOOT=no -> yes 변경후 ESC 누르고 :wq 하고 나온다.
+
+service network restart
+
+/etc/init.d/network restart
+
+sync = 메모리에 있는거 남기지 말고 실행해라
+reboot
+
+# shutdown -h now

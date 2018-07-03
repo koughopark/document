@@ -1,4 +1,211 @@
+7월 2일
+
 소프트웨어는 최신이 좋은게 아닐수 있다.
 
 
+============================================
+
+7월 3일
+
+rdate 날짜 관련
+gcc 컴파일러
+make 빌더
+wget 소프트웨어 외부로 가져올때 크롤링
+gcc-c++ 컴파일러
+cmake c++ 빌드툴
+net-tools 네트워크 관련
+bind-utils 네트워크 관리할때 사용
+psmisc
+
+ps -ef | grep sshd  # sshd 프로세스 전체 출력
+
+ssh root@192.168.1.163  # 시큐어셀 원격 접속
+pass: manager
+
+useradd -g wheel datamaster
+
+ssh datamaster@192.168.1.163
+pass: manager
+
+ip: 192.168.1.163
+
+root 로 재접속
+
+vi time_sync.sh
+
+vi -> 입력하려면 i
+저장하고 나가려면 esc 누르고 :wq
+:w! -> 덮어쓰기
+
+chmod 700 time_sync.sh  # 나만 실행 하겠다
+
+./time_sync.sh  # 현재 시간 확인
+
+mv time_sync.sh /etc/cron.hourly    # etc/corn.hourly 라는 이름으로 이동하겠다(파일이름 붙여주면 리네임해준다)
+
+(w 현재 접속 계정 확인)
+
+vi /etc/sysconfig/selinux
+SELINUX = disabled
+
+ps -ef | grep iptables
+(iptables 는 방화벽 프로그램)
+
+kill -9 # 9번 시그널(kill)을 보내라.
+
+/etc/init.d/iptables start  # 프로세스 시작
+/etc/init.d/iptables stop   # 프로세스 정지
+
+chkconfig  # 리눅스가 시작될때 자동으로 실행되는 데몬 프로그램 출력
+chkconfig iptables off
+
+vi /etc/
+
+버추얼 박스에서 프로젝트에서 우클릭 -> 네트워크 초기화 -> 복제
+완전한 복제 클릭
+
+복제를 했으니 기존의 환경을 새로운 환경으로 바꾸어 줘야 한다.
+------------------
+
+프로젝트2번 시작
+root 접속
+
+ifconfig -a
+
+cd /etc
+cd sysconfig
+cd network-scripts
+
+ls -a
+vi ifcfg-eth0
+HWADDR 부분을 맥어드레스를 버추얼 환경설정 네트워크와 동기화
+
+mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
+ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
+vi ifcfg-eth0 를 해서 DEVICE 부분도 맞춰준다.
+
+호스트 이름을 바꿔줘야 한다. 현재 lx01 -> lx02
+vi /etc/sysconfig/network
+
+요약
+1. ifconfig -a 명령어에 나오는 eth 확인
+2. vi ifcfg-eth(번호) 실행
+3. DEVICE 부분을 동일하게 맞춰준다
+4. 버추얼 박스에서 네트워크 설정에서 MACADDRESS 부분과 HWADDR 부분을 동일하게 맞춰준다
+5. mv ifcfg-eth0 ifcfg-eth1
+6. vi /etc/sysconfig/network 에서 현재 호스트로 변경
+
+ifconfig 기준으로 맞춘다(디바이스 파일이기 때문에)
+
+# shutdown -h now
+
+=============================================================================================
+[[[[[[[[[[
+[my account]
+# ip를 셋팅하기위한 조건
+lx01 eth0 192.168.1.163
+lx02 eth1 192.168.1.188
+lx03 eth1 192.168.1.207
+
+netmask 255.255.255.0
+network 192.168.1.0  # 뒤에것을 0으로 해주면 된다
+gateway 192.168.1.1
+nameserver 168.126.63.1
+]]]]]]]]]]]]]
+=============================================================================================
+
+whoami = 어떤 계정인지 알려준다
+
+passwd
+새 비번 enter
+
+-------------------
+
+lx02 프로젝트 실행
+passwd
+새 비번 enter
+
+vi ifcfg-eth1
+
+------------------------------
+------------------------------
+------------------------------
+
+ip 작업
+xshell 프로그램으로 접속
+ssh root@192.168.1.(ip)
+
+1.==
+cd /etc
+cd sysconfig
+cd network-scripts
+
+vi ifcfg-eth0
+
+BOOTPROTO = static 으로 변경
+
+IPADDR=192.168.1.(ip)
+
+GATEWAY=192.168.1.1
+NETMASK=255.255.255.0
+NETWORK=192.168.1.0
+:wq
+
+
+2.==
+---
+cd /etc
+vi resolv.conf
+---
+search hadoop.com
+
+nameserver 168.126.63.1
+nameserver 168.126.63.2  #예비 서버
+---
+
+ssh root@192.168.1.(ip)  # 서버접속
+
+
+3.==
+# yum -y install traceroute       # 라우트 되는것을 추적하겠다.
+
+# traceroute www.google.com
+
+# ping www.google.com
+
+===============================
+
+ssh ip=> name으로 변경할수 있다.
+C:\Windows\System32\drivers\etc
+웹페이지접속하면 hosts open 부터 연다.
+
+메모장으로 hosts 파일 열기
+[하단]
+192.168.1.163	lx01.hadoop.com
+192.168.1.188	lx02.hadoop.com
+192.168.1.207	lx03.hadoop.com
+추가
+
+#ssh 연결(직접 연결 할때)
+ssh root@lx01.hadoop.com
+ssh root@lx02.hadoop.com
+ssh root@lx03.hadoop.com
+
+------
+xshell 에서 새연결
+이름: lx01
+호스트: lx01.hadoop.com
+---
+사용자 인증탭: 사용자 이름 : root
+----------------
+
+vi /etc/hosts
+192.168.1.163   lx01	lx01.hadoop.com
+192.168.1.188	lx02    lx02.hadoop.com
+192.168.1.207	lx03    lx03.hadoop.com
+설정 저장후
+ssh로 다른 계정 접속방법
+# ssh root@lx03
+
+-------------------
 

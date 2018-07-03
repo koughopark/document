@@ -78,11 +78,11 @@ cd network-scripts
 
 ls -a
 vi ifcfg-eth0
+DEVICE 부분도 맞춰준다.
 HWADDR 부분을 맥어드레스를 버추얼 환경설정 네트워크와 동기화
 
 mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
 ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
-vi ifcfg-eth0 를 해서 DEVICE 부분도 맞춰준다.
 
 호스트 이름을 바꿔줘야 한다. 현재 lx01 -> lx02
 vi /etc/sysconfig/network

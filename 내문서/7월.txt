@@ -257,7 +257,7 @@ cloudera-scm-server
 
  /etc/init.d/cloudera-scm-server status
 
-ppt 참고하여 68p. 진행
+ppt 참고하여 ~68p. 진행
 
 zookeeper 는 클라우데라 속에 포함된 라이브러리
 클라우데라는 전체를 관리해주는 라이브러리

@@ -97,21 +97,32 @@ vi /etc/sysconfig/network
 
 ifconfig 기준으로 맞춘다(디바이스 파일이기 때문에)
 
+/etc/init.d/network restart
+
 # shutdown -h now
 
+=============================================================================================
+=============================================================================================
 =============================================================================================
 [[[[[[[[[[
 [my account]
 # ip를 셋팅하기위한 조건
-lx01 eth0 192.168.1.163
-lx02 eth1 192.168.1.188
-lx03 eth1 192.168.1.207
+lx01 eth0 192.168.1.230
+lx02 eth1 192.168.1.231
+lx03 eth1 192.168.1.232
 
 netmask 255.255.255.0
 network 192.168.1.0  # 뒤에것을 0으로 해주면 된다
 gateway 192.168.1.1
 nameserver 168.126.63.1
 ]]]]]]]]]]]]]
+
+[hosts.txt]
+192.168.1.230	lx01.hadoop.com	lx01
+192.168.1.231	lx02.hadoop.com	lx02
+192.168.1.232	lx03.hadoop.com	lx03
+=============================================================================================
+=============================================================================================
 =============================================================================================
 
 whoami = 어떤 계정인지 알려준다
@@ -174,6 +185,8 @@ ssh root@192.168.1.(ip)  # 서버접속
 # ping www.google.com
 
 ===============================
+===============================
+===============================
 
 ssh ip=> name으로 변경할수 있다.
 C:\Windows\System32\drivers\etc
@@ -181,9 +194,9 @@ C:\Windows\System32\drivers\etc
 
 메모장으로 hosts 파일 열기
 [하단]
-192.168.1.163	lx01.hadoop.com
-192.168.1.188	lx02.hadoop.com
-192.168.1.207	lx03.hadoop.com
+192.168.1.230	lx01.hadoop.com lx01
+192.168.1.231	lx02.hadoop.com lx02
+192.168.1.232	lx03.hadoop.com lx03
 추가
 
 #ssh 연결(직접 연결 할때)
@@ -200,12 +213,74 @@ xshell 에서 새연결
 ----------------
 
 vi /etc/hosts
-192.168.1.163   lx01	lx01.hadoop.com
-192.168.1.188	lx02    lx02.hadoop.com
-192.168.1.207	lx03    lx03.hadoop.com
+192.168.1.230   lx01.hadoop.com lx01
+192.168.1.231   lx02.hadoop.com lx02
+192.168.1.232   lx03.hadoop.com lx03
 설정 저장후
 ssh로 다른 계정 접속방법
 # ssh root@lx03
 
--------------------
+======================================
+======================================
+======================================
+
+7월 4일
+
+root 접속
+wget http://archive.cloudera.com/cm5/installer/5.9.0/cloudera-manager-installer.bin
+---------=======!!!!!!!!!!!!
+wget https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+sudo chmod u+x cloudera-manager-installer.bin
+sudo ./cloudera-manager-installer.bin
+
+설치 완료후 오류나면
+sudo tail -F /var/log/cloudera-scm-agent/cloudera-scm-agent.log
+
+sudo more -T /var/log/cloudera-scm-agent/cloudera-scm-agent.log
+---------=======!!!!!!!!!!!!
+
+clo
+
+echo $PATH
+
+
+chmod 700  cloudera-manager-installer.bin
+
+./cloudera-manager-installer.bin
+
+/etc/init.d/cloudera-scm-server status
+
+cloudera-scm-server
+
+(설치중) root1 다시 접속
+ -> top 입력 // top은 현재 돌고있는 프로세스 확인.
+
+ /etc/init.d/cloudera-scm-server status
+
+ppt 참고하여 68p. 진행
+
+zookeeper 는 클라우데라 속에 포함된 라이브러리
+클라우데라는 전체를 관리해주는 라이브러리
+
+카프카는 버퍼링 하는 것
+
+암호화 선택 X
+
+ps -ef | iptables
+
+ps-ef | grep ipt
+
+[오류나면]
+vi /etc/cloudera-scm-agent/config.ini
+use_tls=0 확인
+
+/etc/init.d/cloudera-scm-agent restart
+
+rpm -qa | grep openssl
+
+/usr/share/cmf/
+
+./uninstall-cloudera-manager.sh
+
+=====================================
 

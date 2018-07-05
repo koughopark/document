@@ -107,9 +107,9 @@ ifconfig 기준으로 맞춘다(디바이스 파일이기 때문에)
 [[[[[[[[[[
 [my account]
 # ip를 셋팅하기위한 조건
-lx01 eth0 192.168.1.230
-lx02 eth1 192.168.1.231
-lx03 eth1 192.168.1.232
+lx01 eth2 192.168.1.237
+lx02 eth3 192.168.1.238
+lx03 eth4 192.168.1.239
 
 netmask 255.255.255.0
 network 192.168.1.0  # 뒤에것을 0으로 해주면 된다
@@ -118,9 +118,20 @@ nameserver 168.126.63.1
 ]]]]]]]]]]]]]
 
 [hosts.txt]
-192.168.1.230	lx01.hadoop.com	lx01
-192.168.1.231	lx02.hadoop.com	lx02
-192.168.1.232	lx03.hadoop.com	lx03
+192.168.1.237	lx01.hadoop.com	lx01
+192.168.1.238	lx02.hadoop.com	lx02
+192.168.1.239	lx03.hadoop.com	lx03
+
+
+cd /etc/sysconfig/network-scripts
+[ifcfg-eth()]
+BOOTPROTO = static 으로 변경
+
+IPADDR=192.168.1.(ip)
+
+GATEWAY=192.168.1.1
+NETMASK=255.255.255.0
+NETWORK=192.168.1.0
 =============================================================================================
 =============================================================================================
 =============================================================================================
@@ -141,15 +152,14 @@ vi ifcfg-eth1
 ------------------------------
 ------------------------------
 ------------------------------
+cd /etc/sysconfig/network-scripts
 
 ip 작업
 xshell 프로그램으로 접속
 ssh root@192.168.1.(ip)
 
 1.==
-cd /etc
-cd sysconfig
-cd network-scripts
+cd /etc/sysconfig/network-scripts
 
 vi ifcfg-eth0
 
@@ -184,6 +194,26 @@ ssh root@192.168.1.(ip)  # 서버접속
 
 # ping www.google.com
 
+
+4.==
+vi /etc/hosts
+192.168.1.237   lx01.hadoop.com lx01
+192.168.1.238   lx02.hadoop.com lx02
+192.168.1.239   lx03.hadoop.com lx03
+
+
+5.==
+메모장으로 hosts 파일 열기
+[하단]
+192.168.1.237	lx01.hadoop.com lx01
+192.168.1.238	lx02.hadoop.com lx02
+192.168.1.239	lx03.hadoop.com lx03
+
+
+6.==
+방화벽 off
+/etc/init.d/iptables stop
+
 ===============================
 ===============================
 ===============================
@@ -194,9 +224,9 @@ C:\Windows\System32\drivers\etc
 
 메모장으로 hosts 파일 열기
 [하단]
-192.168.1.230	lx01.hadoop.com lx01
-192.168.1.231	lx02.hadoop.com lx02
-192.168.1.232	lx03.hadoop.com lx03
+192.168.1.237	lx01.hadoop.com lx01
+192.168.1.238	lx02.hadoop.com lx02
+192.168.1.239	lx03.hadoop.com lx03
 추가
 
 #ssh 연결(직접 연결 할때)
@@ -213,13 +243,17 @@ xshell 에서 새연결
 ----------------
 
 vi /etc/hosts
-192.168.1.230   lx01.hadoop.com lx01
-192.168.1.231   lx02.hadoop.com lx02
-192.168.1.232   lx03.hadoop.com lx03
+192.168.1.237   lx01.hadoop.com lx01
+192.168.1.238   lx02.hadoop.com lx02
+192.168.1.239   lx03.hadoop.com lx03
 설정 저장후
 ssh로 다른 계정 접속방법
 # ssh root@lx03
 
+[브라우저]
+lx01.hadoop.com
+lx02.hadoop.com
+lx03.hadoop.com
 ======================================
 ======================================
 ======================================
@@ -282,5 +316,70 @@ rpm -qa | grep openssl
 
 ./uninstall-cloudera-manager.sh
 
+서버재시작
+/etc/init.d/cloudera-scm-server restart
+
 =====================================
+
+7월 5일
+
+리퀘스트가 세션을 모야서 접속을 한다. 쿠키에 저장.
+
+rm -f java // java 파일을 삭제한다.
+
+[lx02]
+
+java 설치 위치
+/usr/java
+
+usr/bin
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java java
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javac javac
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javadoc javadoc
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javaws javaws
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/jps jps
+ls -l java*
+
+yum install perl-devel // 이미 인스톨 되어 있음
+
+ppt 107 까지 진행
+
+cd (루트로 이동)
+
+ppt 108 진행
+[root@localhost ~]# wget https://www.kernel.org/pub/software/scm/git/git-2.6.4.tar.gz      # 파일 다운로드
+
+[root@localhost ~]# tar xvfz git-2.6.4.tar.gz   # 압축해제
+
+[root@localhost ~]# cd git-2.6.4
+[root@localhost git-2.6.4]# ./configure --prefix=/usr/local  # 환경테스트, 설정을 /usr/local 에 저장
+Checking for gcc...
+
+[root@localhost git-2.6.4]#make     # 컴파일과 빌드작업을 한다
+
+[root@localhost git-2.6.4]# make install    # usr 밑으로 옮겨준다
+
+git --version
+
+git 설치한 이유는 스마트가 소스 가져오려고
+
+mvn(Maven) = java 빌드해준다 => jar 파일이 나온다.
+make = C 빌드해준다
+
+pom.xml
+
+cd 에서
+
+ppr 109
+
+echo $PATH
+
+vi /etc/profile # 수정
+M2_HOME=/usr/local/maven3.3.9
+export PATH=$PATH:$M2_HOME/bin      # 버전이 변경되었을때 한군데만 수정하도록
+export PATH=$PATH:$M2_HOME/bin:$JAVA_HOME/bin   # 윗줄 지우고 이줄로 변경.
+
+mvn
+
+cd /usr/java/jdk1.7.0... #java home
 

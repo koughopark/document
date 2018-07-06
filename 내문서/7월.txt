@@ -107,9 +107,9 @@ ifconfig 기준으로 맞춘다(디바이스 파일이기 때문에)
 [[[[[[[[[[
 [my account]
 # ip를 셋팅하기위한 조건
-lx01 eth2 192.168.1.237
-lx02 eth3 192.168.1.238
-lx03 eth4 192.168.1.239
+lx01 eth2 192.168.1.163
+lx02 eth3 192.168.1.188
+lx03 eth4 192.168.1.207
 
 netmask 255.255.255.0
 network 192.168.1.0  # 뒤에것을 0으로 해주면 된다
@@ -386,6 +386,267 @@ mvn
 cd /usr/java/jdk1.7.0... #java home
 
 ========================================================================================================================
+7월 6일
+
+source /etc/profile
+
+[이클립스]
+프로젝트 -> 우클릭 -> Run As -> Maven build
+gole: mvn clean package
+
+github/bitacademy-bigdata
+
+datamaster@ 에서
+mkdir workspace
+
+깃허브 주소 복사후 앞에 http -> git
+git://github.com/testestzxcv/smartcarlog.git
+
+datamaster@ [smartcar 디렉토리]
+mvn clean install -Dhttps.protocols=TLSv1.2
+mvn -Dhttps.protocols=TLSv1.2 clean install
+
+cd .m2
+la -al
+cd repository
+
+cp -cp working/smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 10
+java -cp working/smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 10
+
+mkdir logs
+
+java -cp working/smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 10
+
+vi log...
+tail ..
+
+java -cp working/smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 100     # 상태정보
+
+java -cp working/smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180101 100    #운행정보
+
+tail -f logs/driving.log
+
+rm -rf logs
+
+cd workking
+
+cd home/datamaster/workspace/smartcarlog/working
+
+java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 100
+
+mkdir logs
+
+java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 100
+
+플롬이라는 수집 프로그램을 사용한다
+플룸에서 데이터 수집하면 하둡에 저장해준다.
+
+java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180101 100
+
+tail -f 가 확인하는 것을 플룸이 하둡에 저장해준다.
+
+풀럼에서 일단 다 모은다.
+
+싱크라는 프로그램
+싱크가 하둡이면 하둡으로 가고,
+다른 프로그램이면 해당 프로그램으로 간다.
+
+카프카에서 적재까지 하는것이 수집
+
+[3.빅데이터 수집]
+17p. ~ 진행
+
+(카프카보다 레디스 프로그램으로 채팅프로그램을 많이 만든다.)
+
+.../smartcar/working/logs/status_20180101.log
+.../smartcar/working/logs/driving_20180101.log
+.../smartcar/working/logs/flume_spool       # <- flume 프로그램이 지켜보고 있다.
+
+
+ppt 30~31p 구성설정 복사후
+cloudera에 붙여넣기
+=====================
+SmartCar.sources  = StatusSource DrivingSource
+SmartCar.channels = StatusChannel DrivingChannel
+SmartCar.sinks    = StatusSink DrivingSink
+
+
+
+SmartCar.sources.StatusSource.type = spooldir
+SmartCar.sources.StatusSource.spoolDir=/home/datamaster/workspace/smartcarlog/working/flume-spool
+SmartCar.sources.StatusSource.deletePolicy = immediate
+SmartCar.sources.StatusSource.batchSize = 1000
+
+SmartCar.sources.StatusSource.interceptors = timeInterceptor typeInterceptor collectDayInterceptor filterInterceptor
+
+# timeInterceptor
+SmartCar.sources.StatusSource.interceptors.timeInterceptor.type = timestamp
+SmartCar.sources.StatusSource.interceptors.timeInterceptor.preserveExisting = true
+
+# typeInterceptor
+SmartCar.sources.StatusSource.interceptors.typeInterceptor.type = static
+SmartCar.sources.StatusSource.interceptors.typeInterceptor.key = logType
+SmartCar.sources.StatusSource.interceptors.typeInterceptor.value = status
+
+# collectDayInterceptor
+SmartCar.sources.StatusSource.interceptors.collectDayInterceptor.type = com.bigdata2017.smartcar.flume.interceptor.CollectDayInterceptor$Builder
+
+# filterInterceptor
+SmartCar.sources.StatusSource.interceptors.filterInterceptor.type = regex_filter
+SmartCar.sources.StatusSource.interceptors.filterInterceptor.regx = ^\\d{14}
+SmartCar.sources.StatusSource.interceptors.filterInterceptor.excludeEvents = false
+
+SmartCar.channels.StatusChannel.type = memory
+SmartCar.channels.StatusChannel.capacity = 100000
+SmartCar.channels.StatusChannel.transactionCapacity = 10000
+
+
+# SmartCar.sinks.StatusSink.type = logger
+SmartCar.sinks.StatusSink.type = hdfs
+SmartCar.sinks.StatusSink.hdfs.path = /smartcar/collection/%{logType}/workdate=%Y%m%d
+SmartCar.sinks.StatusSink.hdfs.filePrefix = %{logType}
+SmartCar.sinks.StatusSink.hdfs.fileSuffix = .log
+SmartCar.sinks.StatusSink.hdfs.fileType = DataStream
+SmartCar.sinks.StatusSink.hdfs.writeFormat = Text
+SmartCar.sinks.StatusSink.hdfs.batchSize = 10000
+SmartCar.sinks.StatusSink.hdfs.rollInterval = 0
+SmartCar.sinks.StatusSink.hdfs.rollCount = 0
+SmartCar.sinks.StatusSink.hdfs.idleTimeout = 100
+SmartCar.sinks.StatusSink.hdfs.callTimeout = 600000
+SmartCar.sinks.StatusSink.hdfs.rollSize = 67108864
+SmartCar.sinks.StatusSink.hdfs.threadsPoolSize = 10
+
+
+
+SmartCar.sources.StatusSource.channels = StatusChannel
+SmartCar.sinks.StatusSink.channel = StatusChannel
+
+
+
+SmartCar.sources.DrivingSource.type = exec
+SmartCar.sources.DrivingSource.command = tail -F /home/datamaster/workspace/smartcarlog/working/logs/driving.log
+SmartCar.sources.DrivingSource.restart = true
+SmartCar.sources.DrivingSource.batchSize = 1000
+
+SmartCar.channels.DrivingChannel.type = memory
+SmartCar.channels.DrivingChannel.capacity= 100000
+SmartCar.channels.DrivingChannel.transactionCapacity = 10000
+
+SmartCar.sinks.DrivingSink.type = org.apache.flume.sink.kafka.KafkaSink
+SmartCar.sinks.DrivingSink.topic = SmartCar-Topic
+SmartCar.sinks.DrivingSink.brokerList = lx02.hadoop.com:9092
+SmartCar.sinks.DrivingSink.requiredAcks = 1
+SmartCar.sinks.DrivingSink.batchSize = 1000
+
+SmartCar.sources.DrivingSource.channels = DrivingChannel
+SmartCar.sinks.DrivingSink.channel = DrivingChannel
+===========================================
+
+36p 진행
+
+[working]
+
+su - # 루트로 변경
+
+cd home/datamaster/workspace/smartcarlog/working
+
+mkdir flume-spool
+
+chown flume:flume flume-spool/  # 소유자를 바꾸겠다.
+
+chmod 705 datamaster/
+
+chown flume:wheel logs
+
+chmod 775 logs
+
+[@datamaster]
+tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
+
+rm -f logs/*
+
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 100
+
+mv ./logs/status_20180101.log ./flume-spool/
+
+rm -f flume-spool/*
+
+ls -l flume-spool/
+
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 20
+
+mv ./logs/status_20180101.log ./flume-spool/
+
+ls -l ./flume-spool/
+
+tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
+
+[ppt p33]
+kafka-topics --create --zookeeper lx02.hadoop.com:2181 --replication-factor 1 --partitions 1 --topic  SmartCar-Topic
+
+kafka-console-producer  --broker-list lx02.hadoop.com:9092 --topic SmartCar-Topic
+
+[다른 콘솔창에서]
+kafka-console-consumer --zookeeper lx02.hadoop.com:2181 --topic SmartCar-Topic --from-beginning  # 전체 다 달라는 의미
+
+ppt 35 기존 메모장에 변경부분 추가
+브라우저에서 설정변경후 재시작
+
+[원래 콘솔창 /working 에서]
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180101 100
+다른콘솔창에서 로그 확인
+
+
+------------------------------------------------------
+
+
+HDFS 클릭 -> NameNode 웹UI (4. 빅데이터 적재 16p)
+하이브 한다음에 이곳에 자주오게된다
+
+http://lx01.hadoop.com:8088
+
+ppt 21p
+/smartcar/collection/status/workdate=20180101   # 디렉토리
+/smartcar/collection/status/workdate=20180102   # 디렉토리
+
+where workdate like '201801'
+
+========================================
+
+[저녁]
+
+깃허브 주소 복사
+
+git clone git://github.com/bitacademy-bigdata/smartcar.flume.interceptor.git
+
+
+cd smartcar.flume.interceptor/
+mvn clean install
+
+mvn clean install -Dhttps.protocols=TLSv1.2
+
+ppt 23p 와 내용 다름
+cp release/com.bigdata2017.smartcar.flume.inteceptor-1.0.jar /opt/cloudera/parcels/CDH-5.15.0-1.cdh5.15.0.p0.21/lib/flume-ng/lib/
+
+[다른창에서]
+tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
+
+[원래창 working]- 로그만들기
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180101 50
+
+mv logs/status_20180101.log flume-spool
+
+[다른창에서]
+tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
+
+hdfs dfs -ls -R /smartcar
+
+책 157p 까지 했다.
+
+hdfs dfs -cat /smartcar/collection/status/workdate=20180706/status.1530874141739.log
+hdfs dfs -tail /smartcar/collection/status/workdate=20180706/status.1530874141739.log
+
+
 ========================================================================================================================
 ========================================================================================================================
 ========================================================================================================================

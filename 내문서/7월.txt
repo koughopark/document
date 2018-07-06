@@ -641,11 +641,14 @@ tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
 
 hdfs dfs -ls -R /smartcar
 
-책 157p 까지 했다.
+책(실무로 배우는 빅데이터 기술) 157p 까지 했다.
 
 hdfs dfs -cat /smartcar/collection/status/workdate=20180706/status.1530874141739.log
 hdfs dfs -tail /smartcar/collection/status/workdate=20180706/status.1530874141739.log
 
+[폴더 디렉토리 완전 삭제]
+rm -r -f folderName
+rm -rf folderName
 
 ========================================================================================================================
 ========================================================================================================================

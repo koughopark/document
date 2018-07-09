@@ -668,14 +668,27 @@ sudo -u flume java  # 플룸으로 자바를 실행하겠다.
 
 tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-lx02.hadoop.com.log
 
-[lx02 다른창] /working
+[lx02 2번창] /working
 sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenStatusLog 20180709 100
 
 mv logs/status_20180709.log flume-spool/
 
+[1창]
 hdfs dfs -ls -R /smartcar
 
 hdfs dfs -cat /smartcar/collection/status/workdate=20180709/status.1531100985396.log
+
+kafka-console-consumer --zookeeper lx02.hadoop.com:2181 --topic SmartCar-Topic
+
+[2창]
+tail -f logs/driving.log
+
+[3번째 창]
+cd /home/da ... working/] tail -f logs/driving.log
+
+[1번창]
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180709 100
+2,3번창 로그 출력
 
 
 

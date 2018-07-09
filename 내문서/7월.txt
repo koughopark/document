@@ -404,7 +404,7 @@ git://github.com/testestzxcv/smartcarlog.git
 
 datamaster@ [smartcar 디렉토리]
 mvn clean install -Dhttps.protocols=TLSv1.2
-mvn -Dhttps.protocols=TLSv1.2 clean install
+# mvn -Dhttps.protocols=TLSv1.2 clean install
 
 cd .m2
 la -al
@@ -690,8 +690,127 @@ cd /home/da ... working/] tail -f logs/driving.log
 sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180709 100
 2,3번창 로그 출력
 
+--------------------------
+
+[오후시간]
+
+Redis
+하둡시스템과 관계없다.
+클라우데라에서 설치할수 없다.
+캐시에서는 Redis 가 최고다.
+
+RDBMS = 강사님 기준, 최고의 프로그램
+
+ppt23p. ~ 진행
+
+[lx01]
+
+hbase shell
+
+create 'test_table', 'cf'   # 테이블 생성
+
+put 'test_table', 'r1', 'cf:model', 'a001'      # 키값이 r1, 칼럼이 model
+
+put 'test_table', 'r1', 'cf:no', '1'
+
+get 'test_table', 'r1'
+
+drop 'test_table'
+
+disable 'test_table'
+
+drop 'test_table'
+
+exit
+
+[lx02]
+id
+
+yum -y install gcc
+
+yum -y install tcl
+
+ppt 33p. ~ 진행
+make install
+[root@lx02 utils]# pwd
+/root/redis-3.0.7/utils
+./install_server.sh
+# 입력없이 엔터
+
+40p 까지 진행
+
+ls -l /etc/init.d
+
+41p ~ 진행
+
+ls -l /etc/init.d/storm*
+
+chmod 755 /etc/init.d/storm-*
+
+mkdir /var/log/storm
+mkdir /var/run/storm
+/etc/init.d/storm-nimbus start
+/etc/init.d/storm-nimbus status
+/etc/init.d/storm-supervisor start
+/etc/init.d/storm-supervisor status
+
+[프로세스 검색]
+ps -ef | grep nimbus
+ps -ef | grep supervisor
+ps -ef | grep ui
+
+[중지할때]
+/etc/init.d/storm-nimbus stop
+/etc/init.d/storm-supervisor stop
+
+tail -f /var/log/storm/
+
+vi /usr/local/storm/conf/storm
+
+ps -ef | grep storm
+
+ls -l /var/run/storm/
+
+(rm -f /var/run/storm/*  # storm 삭제 할때)
+
+[lx02 다른창]  cd /var/log/storm
+tail -f storm-nimbus.out
+tail -f storm-supervisor.out
 
 
+[lx02 1창]
+/etc/init.d/storm-nimbus start
+/etc/init.d/storm-nimbus status
+/etc/init.d/storm-supervisor start
+/etc/init.d/storm-supervisor status
+/etc/init.d/storm-ui start
+/etc/init.d/storm-ui status
+
+cd /home/datamaster/workspace/
+ls -la
+git clone git://github.com/testestzxcv/smartcar.storm.git
+
+ls -l
+cd smartcar.storm/
+# mvn clean install
+mvn clean install -Dhttps.protocols=TLSv1.2
+
+오늘 수업은 토폴로지 만드는것이 키포인트
+
+cd release/
+ls -la
+
+작업은 항상 working 에서 한다
+
+[smartcar.storm/]
+storm jar release/com.bigdata2017.smartcar.storm-1.0.jar com.bigdata2017.smartcar.storm.SmartCarDrivingTopology SmartCarDriving
+
+[02.2 창]
+tail -f /usr/local/storm/logs/worker-6700.log
+
+[02.1]
+cd smartcarlog/working
+sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180709 100
 
 ========================================================================================================================
 ========================================================================================================================

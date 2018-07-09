@@ -95,7 +95,9 @@ Github 프로그램 다운,설치 -> 메뉴에서 VCS -> Import into Version Con
 //Github 가져오기
 
 [이클립스]
-File -> Import -> Git -> Projects from Git -> Clone URI (깃허브에서 프로젝트 경로 복사) -> Next -> Next ... -> 저장 경로 지정 -> 완료.
+1. File -> Import -> Git -> Projects from Git -> Clone URI (깃허브에서 프로젝트 경로 복사) -> Next -> Next ... -> 저장 경로 지정 -> 완료.
+
+2. 깃허브에서 주소 복사 -> Git Repositories 탐색기에서 Ctrl+v -> 해당 프로젝트에서 우클릭후 import project -> 경로설정
 
 [파이참]
 VCS -> Check out from ... -> Git -> 깃허브에서 프로젝트 경로 복사, 저장 경로 지정 -> 완료.

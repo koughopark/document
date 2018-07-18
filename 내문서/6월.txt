@@ -50,6 +50,7 @@ SCM 소스코드메니지먼트
 
 ================
 
+[CMD]
 git config --global user.email "illuillu55@hotmail.com"
 git config --global user.name "james"
 

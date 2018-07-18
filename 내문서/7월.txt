@@ -118,9 +118,9 @@ nameserver 168.126.63.1
 ]]]]]]]]]]]]]
 
 [hosts.txt]
-192.168.1.237	lx01.hadoop.com	lx01
-192.168.1.238	lx02.hadoop.com	lx02
-192.168.1.239	lx03.hadoop.com	lx03
+192.168.1.72	lx01.hadoop.com	lx01
+192.168.1.73	lx02.hadoop.com	lx02
+192.168.1.75	lx03.hadoop.com	lx03
 
 
 cd /etc/sysconfig/network-scripts
@@ -197,17 +197,17 @@ ssh root@192.168.1.(ip)  # 서버접속
 
 4.==
 vi /etc/hosts
-192.168.1.237   lx01.hadoop.com lx01
-192.168.1.238   lx02.hadoop.com lx02
-192.168.1.239   lx03.hadoop.com lx03
+192.168.1.163   lx01.hadoop.com lx01
+192.168.1.188   lx02.hadoop.com lx02
+192.168.1.207   lx03.hadoop.com lx03
 
 
 5.==
 메모장으로 hosts 파일 열기
 [하단]
-192.168.1.237	lx01.hadoop.com lx01
-192.168.1.238	lx02.hadoop.com lx02
-192.168.1.239	lx03.hadoop.com lx03
+192.168.1.163	lx01.hadoop.com lx01
+192.168.1.188	lx02.hadoop.com lx02
+192.168.1.207	lx03.hadoop.com lx03
 
 
 6.==
@@ -224,9 +224,9 @@ C:\Windows\System32\drivers\etc
 
 메모장으로 hosts 파일 열기
 [하단]
-192.168.1.237	lx01.hadoop.com lx01
-192.168.1.238	lx02.hadoop.com lx02
-192.168.1.239	lx03.hadoop.com lx03
+192.168.1.163	lx01.hadoop.com lx01
+192.168.1.188	lx02.hadoop.com lx02
+192.168.1.207	lx03.hadoop.com lx03
 추가
 
 #ssh 연결(직접 연결 할때)
@@ -243,9 +243,9 @@ xshell 에서 새연결
 ----------------
 
 vi /etc/hosts
-192.168.1.237   lx01.hadoop.com lx01
-192.168.1.238   lx02.hadoop.com lx02
-192.168.1.239   lx03.hadoop.com lx03
+192.168.1.163   lx01.hadoop.com lx01
+192.168.1.188   lx02.hadoop.com lx02
+192.168.1.207   lx03.hadoop.com lx03
 설정 저장후
 ssh로 다른 계정 접속방법
 # ssh root@lx03
@@ -813,6 +813,15 @@ cd smartcarlog/working
 sudo -u flume java -cp smartcarlog.jar com.bigdata2017.smartcar.GenDrivingLog 20180709 100
 
 ========================================================================================================================
+
+7월 17일
+
+h0: 귀무가설은 전제하는것이지 증명의 대상이 아니다
+
+h1: 대립가설은 증명하고 싶은것 (의미가 있고 흥미가 있는 가설)
+
+
+
 ========================================================================================================================
 ========================================================================================================================
 ========================================================================================================================

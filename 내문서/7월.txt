@@ -94,6 +94,7 @@ vi /etc/sysconfig/network
 4. 버추얼 박스에서 네트워크 설정에서 MACADDRESS 부분과 HWADDR 부분을 동일하게 맞춰준다
 5. mv ifcfg-eth0 ifcfg-eth1
 6. vi /etc/sysconfig/network 에서 현재 호스트로 변경
+7. hosts qusrud
 
 ifconfig 기준으로 맞춘다(디바이스 파일이기 때문에)
 
@@ -172,6 +173,7 @@ NETMASK=255.255.255.0
 NETWORK=192.168.1.0
 :wq
 
+mv ifcfg-eth0 ifcfg-eth1
 
 2.==
 ---
@@ -215,7 +217,8 @@ vi /etc/hosts
 /etc/init.d/iptables stop
 
 
-7.==
+
+7.== 클라우데라 설치후
 cd /etc/cloudera-scm-agent/
 vi config.ini -> ip lx01로 변경
 lx02, lx03 도 lx01 ip 로 변경
@@ -382,7 +385,7 @@ pom.xml
 cd 에서
 
 ppt 109
-
+r
 echo $PATH
 
 vi /etc/profile # 하단 추가

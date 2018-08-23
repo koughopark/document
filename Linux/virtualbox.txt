@@ -18,13 +18,13 @@ skip
 id: root
 pass : manager
 
-# ifconfig -a
-# cd /etc
-# cd sysconfig
-# cd network-scripts
-# pwd
-# ls
-# vi ifcfg-eth0
+ifconfig -a
+cd /etc
+cd sysconfig
+cd network-scripts
+pwd
+ls
+vi ifcfg-eth0
 insert 누르고 OnBOOT=no -> yes 변경후 ESC 누르고 :wq 하고 나온다.
 
 service network restart

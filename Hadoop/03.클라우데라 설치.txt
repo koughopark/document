@@ -1,0 +1,57 @@
+server01 root 접속
+wget https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+
+chmod 700  cloudera-manager-installer.bin
+
+./cloudera-manager-installer.bin    # 클라우데라 인스톨
+	Accept this license? -> yes
+
+# 설치중 확인
+(다른창) server1 다시 접속
+ -> top 입력 # top은 현재 돌고있는 프로세스 확인.
+
+# 설치후 확인
+/etc/init.d/cloudera-scm-server status
+chkconfig --list
+
+//
+clo
+echo $PATH
+//
+
+==============[웹페이지]================
+
+server01.hadoop.com:7180
+
+ID: admin
+pass: admin
+
+호스트 지정
+server01.hadoop.com
+server02.hadoop.com
+server03.hadoop.com
+
+클러스터 설치
+KAFKA 선택
+JDK 설치 옵션
+	Oracle Java SE Development Kit 설치 체크
+단일 사용자 모드 Skip
+암호설정: enter
+
+클러스터 설정(Select Services)
+- 사용자 지정 서비스 선택
+	HDFS, YARN, ZooKeeper 체크
+- 위치지정
+	HDFS: server01
+	Cloudera Management Service: server03
+	YARN: server01
+	ZooKeeper: server02
+- 데이터베이스 설정
+	내장된 데이터베이스 사용
+	테스트 연결
+- 변경내용 검토
+	Skip
+~
+- 종료
+
+

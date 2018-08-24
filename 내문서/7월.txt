@@ -81,8 +81,8 @@ vi ifcfg-eth0
 DEVICE 부분도 맞춰준다.
 HWADDR 부분을 맥어드레스를 버추얼 환경설정 네트워크와 동기화
 
-mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
 ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
+mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
 
 호스트 이름을 바꿔줘야 한다. 현재 lx01 -> lx02
 vi /etc/sysconfig/network
@@ -119,9 +119,9 @@ nameserver 168.126.63.1
 ]]]]]]]]]]]]]
 
 [hosts.txt]
-192.168.1.72	lx01.hadoop.com	lx01
-192.168.1.73	lx02.hadoop.com	lx02
-192.168.1.75	lx03.hadoop.com	lx03
+192.168.1.72	lx01.hadoop.com
+192.168.1.73	lx02.hadoop.com
+192.168.1.75	lx03.hadoop.com
 
 
 cd /etc/sysconfig/network-scripts
@@ -190,11 +190,11 @@ ssh root@192.168.1.(ip)  # 서버접속
 
 
 3.==
-# yum -y install traceroute       # 라우트 되는것을 추적하겠다.
+ yum -y install traceroute       # 라우트 되는것을 추적하겠다.
 
-# traceroute www.google.com
+ traceroute www.google.com
 
-# ping www.google.com
+ ping www.google.com
 
 
 4.==

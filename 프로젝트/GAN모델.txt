@@ -1,0 +1,10 @@
+DCGAN(Deep Convolutional GAN)
+- 합성곱(Convolution)과 ‘Transposed Convolution(Fractional-Strided Convolution)’으로 네트워크 구조를 만들었다.
+- DCGAN의 또 다른 특징은 배치 정규화(Batch Normalization)를 사용했다는 점이다. 배치 정규화는 레이어의 입력 데이터 분포가 치우쳐져 있을 때 평균과 분산을 조정해주는 역할을 한다.
+- DCGAN은 마지막 레이어를 제외하고 생성자의 모든 레이어에 ReLU를 사용했고, 구분자의 모든 레이어에 LeakyReLU를 사용했다.
+- DCGAN의 성공은 GAN 모델이 유명해지는 데 결정적인 역할을 했다. DCGAN에서 사용한 모델 구조는 아직도 새로운 GAN 모델을 설계할 때 베이스 모델이 되고 있다.
+- DCGAN의또 다른 혁신은 학습이 잘 이뤄졌는지 확인하기 위한 여러 가지 검증 방법을 도입했다는 점이다.
+
+cGAN(이미지를 새로운 이미지로 변형)
+- 이미지를 처음부터 만드는 것이 아니라, 기존에 있던 이미지를 변형시켜준다.
+- 

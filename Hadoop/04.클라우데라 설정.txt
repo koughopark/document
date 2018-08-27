@@ -1,0 +1,55 @@
+[웹페이지.클라우데라]
+1. 호스트 -> 역할(Roles)
+		Host별 설치 소프트웨어 보기
+
+2. CM(클라우데라) 사용하기
+	Hadoop DataNode 추가
+		HDFS -> 역할 인스턴스 추가 -> DataNode 클릭 -> 사용자 지정
+		-> 1번 체크 -> 확인 -> 계속 -> 완료 -> 새로추가된 데이터노드 체크
+		-> 선택된 작업(Actions for Selected) -> 시작
+
+3. HDFS 설정
+	HDFS 클릭 -> 구성 ->
+	Replication Factor(dfs.replication): 2
+	Check HDFS Permissions(dfs.permissions): 체크해제
+	HDFS Block Size(dfs.block.size, dfs.block.size): 64MB
+
+4. YARN 설정
+	Container Memory Maximum(yarn.scheduler.maximum-allocation-mb): 1.5 GiB
+	Container Memory(yarn.nodemanager.resource.memory-mb): 5Gib
+	Scheduler Class(yarn.resourcemanager.scheduler.class): org...fifo.FifoScheduler
+
+5. 클러스터 재실행 (Cluster 1 -> Restart)
+	클라이언트 구성 재배포 -> 클라이언트 구성 배포 -> 완료
+
+6. 샘플파일 업로드
+	파일질라:
+		프로토콜: SFTP - SSH File Transfer Protocol
+		호스트: server02.hadoop.com
+		포트: 22
+		로그온 유형: 일반
+		사용자: root
+		비밀번호: 비밀번호
+
+		/home/datamaster/test-data/ <- Sample.txt 파일 복사
+
+	HDFS에 파일 저장
+		hdfs dfs -put Sample.txt /tmp
+
+	저장된 파일 확인
+		hdfs dfs -ls /tmp
+
+	저장된 파일 읽기
+		hdfs dfs -cat /tmp/Sample.txt
+
+	저장된 파일 상태
+		hdfs dfs -stat '%b %o %r %u %n' /tmp/Sample.txt
+
+	저장된 파일 이름 바꾸기
+		hdfs dfs -mv /tmp/Sample.txt /tmp/Sample.txt.bak
+		hdfs dfs -ls /tmp
+
+	hdfs 검사
+		hdfs fsck /
+
+

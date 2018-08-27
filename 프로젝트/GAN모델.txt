@@ -7,4 +7,29 @@ DCGAN(Deep Convolutional GAN)
 
 cGAN(이미지를 새로운 이미지로 변형)
 - 이미지를 처음부터 만드는 것이 아니라, 기존에 있던 이미지를 변형시켜준다.
-- 
+- 한 영역의 이미지를 다른 영역의 이미지로 변형하는 문제의 경우 cGAN이 유용하게 쓰일 수 있다.
+
+WGAN(Wasserstein GAN)
+- GAN에서 실제 데이터 분포와 근사하는 분포가 얼마나 다른지 측정하는 거리 개념을 바꿔 안정적인 학습을 가능하게 만들었다.
+
+EBGAN(Energy-based GAN)
+- GAN을 에너지 관점에서 바라봄으로써 역시 더 안정적인 학습을 추구했다.
+
+BEGAN(Boundary Equilibrium GAN)
+- WGAN과 EBGAN을 발전시켜 생성하는 이미지의 퀄리티를 획기적으로 높이고 이미지의 퀄리티와 다양성을 컨트롤 할 수 있게 했다.
+- 실제 같은 사람 얼굴 이미지들이 BEGAN의 결과물이다.
+
+CycleGAN, DiscoGAN
+- 두 영역의 이미지 데이터셋이 매칭돼 있지 않아도 이미지 변형을 가능하게 하는 모델이다.
+
+StarGAN
+- 세 개 이상의 영역 사이의 이미지 변형을 시도했다.
+
+SRGAN(Super-Resolution GAN)
+- 사진의 해상도를 높인다.
+
+SEGAN(Speech Enhancement GAN)
+- 음성 녹음에서 노이즈를 줄여준다.
+
+
+cGAN, BEGAN, SRGAN

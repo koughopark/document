@@ -30,7 +30,6 @@ java -version
 yum install perl-devel # 이미 인스톨 되어 있음
 
 
-[server01]
 1. git client설치
 wget https://www.kernel.org/pub/software/scm/git/git-2.6.4.tar.gz      # 파일 다운로드
 
@@ -58,12 +57,47 @@ git --version
 			export PATH=$PATH:$M2_HOME/bin:$JAVA_HOME/bin   # 윗줄 지우고 이줄로 변경.
 
 	source /etc/profile
-	mvn --version
+	mvn --version   # 설치 확인
 
 
-파일질라:
-	bigdata.smartcar.loggen-1.0.jar 파일 -> /home/pilot-pjt/working 에 업로드
+#파일질라:
+#	bigdata.smartcar.loggen-1.0.jar 파일 -> /home/pilot-pjt/working 에 업로드
+#
+#Xshall:
+#	cd /home/pilot-pjt/working
+#	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160101 10
 
-Xshall:
-	cd /home/pilot-pjt/working
-	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160101 10
+3. 스마트카 로그 시뮬레이터 설치
+책. 99p~
+
+#cd /home
+#mkdir /home/pilot-pjt
+#mkdir /home/pilot-pjt/working
+#mkdir /home/pilot-pjt/working/car-batch-log
+#mkdir /home/pilot-pjt/working/driver-realtime-log
+#chmod 777 -R /home/pilot-pjt
+
+[파일질라]
+bigdata.smartcar.loggen-1.0.jar 파일
+-> server02.hadoop.com/home/pilot-pjt/working 에 업로드
+
+cd /home/pilot-pjt/working
+java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160101 10
+
+[새로운 server02 세션]
+cd /home/pilot-pjt/working/driver-realtime-log
+tail -f SmartCarDriverInfo.log
+
+ps -ef | grep smartcar.log  # pid 출력, root 뒷번호
+kill -9 [pid]
+
+cd /home/pilot-pjt/working
+java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 10
+
+[새로운 server02 세션]
+cd /home/pilot-pjt/working/SmartCar
+tail -f SmartCarStatusInfo_20160101.txt
+
+ps -ef | grep smartcar.log  # pid 출력, root 뒷번호
+kill -9 [pid]
+

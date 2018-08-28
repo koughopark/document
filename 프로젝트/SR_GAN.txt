@@ -1,0 +1,9 @@
+
+SR GAN 설명 (Paper Reading)
+https://github.com/MagmaTart/Paper-Reading/blob/master/summarys/SRGAN.md
+
+논문 링크
+https://arxiv.org/pdf/1609.04802.pdf
+
+깃허브 코드
+https://github.com/tensorlayer/srgan

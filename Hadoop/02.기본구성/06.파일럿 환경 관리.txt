@@ -1,0 +1,22 @@
+
+[server01 세션]
+
+1. 환경시작
+service cloudera-scm-server status; # 클라우데라 실행 확인
+
+[웹페이지]
+CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cluster1] 콤보박스 클릭 -> 재시작
+
+CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cloudera Management Service] 콤보박스 클릭 -> 재시작
+
+2. 환경 종료
+-개발환경 시작의 역순.
+	CM홈에서 Cluster1 중지 -> 클라우데라 관리 서비스 중지
+
+-SSH에서 server01, 02, 03 접속
+	halt
+	(or)
+	shutdown -h now
+	(or)
+	버추얼 박스의 가상머신에서 종료
+

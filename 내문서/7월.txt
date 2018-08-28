@@ -390,7 +390,7 @@ echo $PATH
 
 vi /etc/profile # 하단 추가
 M2_HOME=/usr/local/maven3.3.9
-export PATH=$PATH:$M2_HOME/bin      # 버전이 변경되었을때 한군데만 수정하도록
+#export PATH=$PATH:$M2_HOME/bin      # 버전이 변경되었을때 한군데만 수정하도록
 export PATH=$PATH:$M2_HOME/bin:$JAVA_HOME/bin   # 윗줄 지우고 이줄로 변경.
 
 mvn

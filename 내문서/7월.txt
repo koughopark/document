@@ -478,14 +478,15 @@ tail -f 가 확인하는 것을 플룸이 하둡에 저장해준다.
 ppt 30~31p 구성설정 복사후
 cloudera에 붙여넣기
 =====================
-SmartCar.sources  = StatusSource DrivingSource
-SmartCar.channels = StatusChannel DrivingChannel
-SmartCar.sinks    = StatusSink DrivingSink
+# 변수정의
+SmartCar.sources  = StatusSource    # DrivingSource
+SmartCar.channels = StatusChannel   # DrivingChannel
+SmartCar.sinks    = StatusSink  # DrivingSink
 
-
-
+# 에이전트의 Source를 설정
 SmartCar.sources.StatusSource.type = spooldir
-SmartCar.sources.StatusSource.spoolDir=/home/datamaster/workspace/smartcarlog/working/flume-spool
+#SmartCar.sources.StatusSource.spoolDir=/home/datamaster/workspace/smartcarlog/working/flume-spool
+SmartCar.sources.StatusSource.spoolDir=/home/pilot-pjt/working/car-batch-log
 SmartCar.sources.StatusSource.deletePolicy = immediate
 SmartCar.sources.StatusSource.batchSize = 1000
 

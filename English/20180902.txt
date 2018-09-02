@@ -1,0 +1,4 @@
+https://research.nvidia.com/publication/2017-10_Learning-to-Super-Resolve
+
+Figure 1. Low-resolution blurry images are challenging for the state-of-the-art super-resolution and deblurring methods. Sequentially applying super-resolution and deblurring methods further exacerbates the artifacts. Our method learns to reconstruct realistic results with clear structures and fine details.
+

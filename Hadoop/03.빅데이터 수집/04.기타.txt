@@ -1,0 +1,23 @@
+1. 로그 경로
+	Hadoop 에코시스템 서버들의 로그 위치: /var/log/디렉토리(cloudera, Hadoop, Oozie 등)
+	Redis 서버 로그 위치: /var/log/redis_6379.log
+	Storm 서버 로그 위치: /home/pilot-pjt/storm/logs/
+	Zeppelin 서버 로그 위치: /home/pilot-pjt/zeppelin-0.6.2-bin-all/logs
+
+2. 파일럿 환경에서 HDFS 문제발생
+	# HDFS상에 CORRUPT BLOCKS/FILES 문제 발생하거나, sAFE 모드로 전환 되지 못하는 경우
+	# HDFS의 파일/블록 깨짐 또는 Safe 모드 전환 여부를 체크
+
+	# HDFS 파일 시스템 검사
+	hdfs fsck /
+
+	# HDFS에 Safe 모드 발생후 빠져 나오지 못할 경우
+	# Safe 모드 강제 해제
+	hdfs dfsadmin -safemode leave
+
+	# HDFS에 CORRUPT BLOCKS/FILES 등이 발생해 복구 불가일 경우
+	# 손상된 파일 강제 삭제
+	hdfs fsck / -delete
+
+	# 손상된 파일을 /lost + found 디렉터리로 이동
+	hdfs fsck / -move

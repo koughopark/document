@@ -1,0 +1,36 @@
+1. SmartCar 로그 시뮬레이터 작동
+	[server02] # bigdata.smartcar.loggen-1.0.jar가 위치한 곳으로 이동
+	cd /home/pilot-pjt/working
+
+	# 2개의 스마트카 로그 시뮬레이터를 백그라운드 방식으로 실행
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 3 &
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160101 3 &
+
+	# 정상적으로 시뮬레이터가 작동되고 있는지 확인
+	/home/pilot-pjt/working/SmartCar # 해당 경로에 SmartCarStatusInfo_20160101.txt 파일이 생성되어있는지 확인.
+	/home/pilot-pjt/working/driver-realtime-log # 해당 경로에 SmartCarDriverInfo.log 파일이 생성되어있는지 확인. tail -f SmartCarDriverInfo.log 명령어로 확인
+
+	# /home/pilot-pjt/working/SmartCar 경로에 만들어진 SmartCarStatusInfo_20160101.txt 파일을 플럼 SmartCarInfo 에이전트의 SpoolDir 경로로 옮긴다.
+	mv /home/pilot-pjt/working/SmartCar/SmartCarStatusInfo_20160101.txt /home/pilot-pjt/working/car-batch-log/
+
+2. 플럼 에이전트 작동
+	# 플럼 에이전트를 작동시켜 스마트카 로그 시뮬레이터가 만들어낸 두 유형의 로그를 수집
+	CM홈 -> [Flume] -> 콤보박스클릭 -> 재시작
+
+3. 카프카 Consumer 작동
+	[server02]
+	kafka-console-consumer --zookeeper server02.hadoop.com:2181 --topic SmartCar-Topic
+	# 스마트카의 운행 로그 데이터가 실시간으로 카프카에 유입되는것 확인
+
+4. 수집 기능 점검
+	[server02]
+	# 스마트카의 상태 정보 로그 파일이 플럼의 표준 출력 로그로 전송됐는지 리눅스 tail 명령어를 통해 확인
+	tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-server02.hadoop.com.log
+
+	# 스마트카 운전자의 실시간 운전 정보인 DriverCarInfo가 정상적으로 수집되는지 확인
+	kafka-console-consumer --zookeeper server02.hadoop.com:2181 --topic SmartCar-Topic
+
+	# 백그라운드로 실행했던 스마트카 로그 시뮬레이터 종료
+	ps -ef | grep smartcar.log  # pid 기억
+	kill -9 [pid]
+

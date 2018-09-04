@@ -1,3 +1,4 @@
+
 1. 로그 경로
 	Hadoop 에코시스템 서버들의 로그 위치: /var/log/디렉토리(cloudera, Hadoop, Oozie 등)
 	Redis 서버 로그 위치: /var/log/redis_6379.log

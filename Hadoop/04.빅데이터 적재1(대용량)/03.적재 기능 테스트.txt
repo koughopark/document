@@ -1,0 +1,47 @@
+1.플럼의 사용자 정의 Interceptor 추가
+	[server02]
+	파일질라 실행 -> /opt/cloudera/parcels/CDH-5.15.1-1.cdh5.15.1.p0.4/lib/flume-ng/lib 경로에
+	bigdata.smartcar.flume-1.0.jar 파일 업로드   # CH04예제
+
+2.플럼의 Conf 파일 수정
+	# 플럼의 Conf 파일을 HDFS에 적재하는 Sink 구조로 변경
+	# 02. 플럼 구성 파일 변경 이후
+	Flume -> 플럼 재시작
+
+3. SmartCar 로그 시뮬레이터 작동
+	[server02]
+	cd /home/pilot-pjt/working
+	# 스마트카 로그 시뮬레이터를 자바 명령으로 백그라운드 방식으로 실행. 2016년 1월 1일의 100대의 스마트카에 상태 정보 로그를 생성
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 100 &
+
+	# 정상 작동 됐는지 확인. SmartCarStatusInfo_20160101.txt 파일 생성 확인
+	cd /home/pilot-pjt/working/SmartCar
+	tail -f SmartCarStatusInfo_20160101.txt
+
+4. 플럼 이벤트 작동
+	# 플럼의 SmartCar 에이전트가 정상적으로 작동하고 있다면 SpoolDir이 참조하고 있는 /home/pilot-pjt/working/car-batch-log 경로에 파일이 생성됨과 동시에 플럼의 파일 수집 이벤트가 작동
+	# /home/pilot-pjt/working/SmartCar 경로에 만들어진 SmartCarStatusInfo_20160101.txt 파일을 플럼의 SmartCarInfo의 SpoolDir 경로인 /home/pilot-pjt/working/car-batch-log로 옮겨서 플럼의 File 이벤트가 작동되게 해보자.
+	mv /home/pilot-pjt/working/SmartCar/SmartCarStatusInfo_20160101.txt /home/pilot-pjt/working/car-batch-log/
+
+	# 플럼의 실행 로그를 통해 SmartCarInfo_Agent가 정상적으로 작동하는지 확인
+	cd /var/log/flume-ng/
+	tail -f /var/log/flume-ng/flume-cmf-flume-AGENT-server02.hadoop.com.log
+
+	# 잠시 진행 기다림
+	# Writer callback called 라는 메시지가 나오면 모든 HDFS 적재 성공
+
+5. HDFS 명령어 확인
+	# ls 명령 중 -R 옵션을 지정하면 해당 하위 디렉터리의 모든 파일 목록을 볼수 있다.
+	hdfs dfs -ls -R /pilot-pjt/collect/car-batch-log/
+	# "wrk_date=작업일자" 기억
+
+	# HDFS에 적재된 스마트카 상태 정보 파일 내용 확인
+	# hdfs dfs -cat "출력된 디렉터리/파일명.log"
+	hdfs dfs -cat /pilot-pjt/collect/car-batch-log/wrk_date=20180905/car-batch-log.1536155332475.log
+
+	# 단순 데이터 확인에는 tail 명령을 권장
+	hdfs dfs -tail /pilot-pjt/collect/car-batch-log/wrk_date=20180905/car-batch-log.1536155332475.log
+
+	# 백그라운드로 실행했던 스마트카 로그 시뮬레이터 종료
+	ps -ef | grep smartcar.log  # pid 기억
+	kill -9 [pid]

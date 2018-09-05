@@ -1,0 +1,16 @@
+1. 이미 2장에서 CM을 이용해 설치 완료.
+	# 하둡 웹 관리 화면에 접속해서 설치된 하둡의 상태 정보를 확인.
+	http://server01.hadoop.com:50070
+	or
+	CM 홈 -> HEFS 선택 -> 상단 메뉴[NameNode 웹 UI] 클릭
+
+	# 리소스 매니저
+	http://server01.hadoop.com:8088/cluster
+	or
+	CM 홈 -> YARN 선택 -> 상단 메뉴[웹 UI] 클릭 -> ResourceManager 웹 UI 선택
+
+	# 잡(Job) 히스토리
+	http://server01.hadoop.com:19888/jobhistory
+	or
+	CM 홈 -> YARN 선택 -> 상단 메뉴[웹 UI] 클릭 -> HistoryServer 웹 UI 선택
+

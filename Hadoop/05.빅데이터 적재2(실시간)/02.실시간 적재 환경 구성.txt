@@ -130,7 +130,7 @@ ui.port: 8087
 	mkdir /var/log/storm
 	mkdir /var/run/storm
 
-	# 세 파일에 대해 아래의 service/chkconfig 등록 명령 실행
+	# 세 파일에 대해 아래의 service/chkconfig 등록 명령 실행 | 종료는 stop
 	service storm-nimbus start
 	service storm-supervisor start
 	service storm-ui start

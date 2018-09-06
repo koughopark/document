@@ -1,0 +1,18 @@
+1. 이클립스 실행
+	File -> Import ->
+	General -> Existing Projects into Workspace -> Next
+	Select root directory: -> Browse.. 클릭 -> 소스선택 -> Finish
+
+2. 소스 실행
+	좌측 Package Explorer -> pom.xml 파일 열기
+	상단메뉴 Run -> Run As -> Maven install 클릭
+
+3. 업로드
+#	Package Explorer 의 target 디렉터리 안에 bigdata.smartcar.storm-1.0.jar 파일이 생성되있다.
+#	해당 파일을
+#	server02의 /home/pilot-pjt/working 디렉터리에 업로드
+	파일럿 작업 경로: sftp://server02.hadoop.com/home/pilot-pjt/working
+
+	# 스톰 Topology 재배포
+	storm kill DriverCarInfo
+	storm jar bigdata.smartcar.storm-1.0.jar com.wikibook.bigdata.smartcar.storm.SmartCarDriverTopology DriverCarInfo

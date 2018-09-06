@@ -1,7 +1,7 @@
 리퀘스트가 세션을 모아서 접속을 한다. 쿠키에 저장.
 
 java 설치 시스템
-[lx02]
+[server02]
 
 java 설치 경로
 /usr/java
@@ -58,6 +58,7 @@ git --version
 
 	source /etc/profile
 	mvn --version   # 설치 확인
+
 
 
 #파일질라:

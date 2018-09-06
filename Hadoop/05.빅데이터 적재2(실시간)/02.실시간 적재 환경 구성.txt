@@ -1,0 +1,146 @@
+1. HBase 설치
+	CM 홈 -> Cluster1 콤보박스 -> 서비스 추가 -> HBase 선택 -> 계속 ->
+
+	HBase에 대한 역할 할당 사용자 지정 페이지:
+	Master: server01
+	REST Server: 선택 안함
+	Thrift Server: server01
+	RegionServer: server01 ~ server03
+	-> 계속 ->
+
+	변경 내용 검토 페이지:
+	기본값 유지 -> 계속 -> 첫 번째 실행 명령 -> 계속 -> 완료
+	-> CM 홈 -> HBase 콤보박스 -> 시작 -> 완료후 닫기
+	-> CM 홈 -> HBase 재배포 클릭 -> 이전 서비스 재시작 -> 지금 재시작 -> 완료
+
+2. HBase 설치 완료 확인
+	[server01, root]
+	hbase shell
+	> create 'smartcar_test_table', 'cf'
+	> put 'smartcar_test_table', 'row-key1', 'cf:model', 'Z0001'
+	> put 'smartcar_test_table', 'row-key1', 'cf:no', '12345'
+	> get 'smartcar_test_table', 'row-key1'
+
+	# Test 테이블 삭제
+	> disable 'smartcar_test_table'
+	> drop 'smartcar_test_table'
+	> exit
+
+3. 레디스 설치
+	[server02, root]
+	# 기본 환경 구성 설치
+	yum install -y gcc*
+	yum install -y tcl
+
+	# 레디스 3.0.7 설치
+	cd /home/pilot-pjt
+	wget http://download.redis.io/releases/redis-3.0.7.tar.gz
+	tar -xvf redis-3.0.7.tar.gz
+	cd /home/pilot-pjt/redis-3.0.7
+	make
+	make install
+	cd utils
+	chmod 755 install_server.sh
+	./install_server.sh
+	-> (기본값)엔터 ... 엔터
+
+4. 레디스 설치 확인
+	service redis_6379 status   # Redis is running 출력 확인
+
+	# 레디스 시작/종료 명령어
+	service redis_6379 start
+	service redis_6379 stop
+
+5. CLI를 통한 레디스 서버에 데이터를 저장/조회
+	redis-cli
+	> set key:1 Hello!BigData
+	> get key:1
+	> del key:1
+	> quit
+
+6. 스톰 설치
+	[server02, root]
+	cd /home/pilot-pjt
+	wget http://archive.apache.org/dist/storm/apache-storm-0.9.6/apache-storm-0.9.6.tar.gz
+	tar -xvf apache-storm-0.9.6.tar.gz
+	ln -s apache-storm-0.9.6 storm
+
+7. 스톰의 환경설정 파일 수정
+	cd /home/pilot-pjt/storm/conf
+	# storm.yaml 수정
+	vi storm.yaml
+=== [내부 입력] ===
+storm.zookeeper.servers:
+ - "server02.hadoop.com"
+
+storm.local.dir: "/home/pilot-pjt/storm/data"
+
+nimbus.host: "server02.hadoop.com"
+
+supervisor.slots.ports:
+ - 6700
+
+ui.port: 8087
+# 차례대로
+#1. 주키퍼 정보
+#2. 스톰이 작동하는데 필요한 데이터 저장소
+#3. 스톰의 Nimbus 정보
+#4. Worker의 포트, 포트의 개수만큼 멀티 Worker가 만들어진다.
+#5. 스톰 UI 접속 포트 설정
+=======================
+
+	# 스톰의 로그 레벨 조정
+	cd /home/pilot-pjt/storm/logback
+	vi cluster.xml
+	[내부 수정]
+	# 하단 ref="A1", "ACCESS", "METRICS" 문단의
+	<root level="INFO"> => INFO 부분을 ERROR로 변경
+
+	# 스톰 패스 설정
+	vi /root/.bash_profile
+	====[내부 추가]=======
+	PATH=$PATH:$HOME/bin
+	PATH=$PATH: /home/pilot-pjt/storm/bin   <- 추가
+	export PATH
+	============
+	source /root/.bash_profile
+
+	# 파일럿 환경구성 다시 설정
+	rm /usr/bin/java    # y 엔터
+	rm /usr/bin/javac   # y 엔터
+	ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javac /usr/bin/javac
+	ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java /usr/bin/java
+
+	# 리눅스 재시작시 스톰 자동실행 설정. 3개의 스톰 서비스(Nimbus, Supervisor, UI) 3개의 자동 실행 스크립트 필요
+	# - storm-nimbus , storm-supervisor , storm-ui (https://gist.github.com/yulrizka에서 가져온 소스, 참고만)
+	# 예제 5.1 파일
+
+	# 스톰의 서비스 등록파일 업로드
+	파일질라 실행 ->
+	스크립트 경로:
+		sftp://server02.hadoop.com/etc/rc.d/init.d
+		storm-nimbus, storm-supervisor, storm-ui 파일 업로드
+
+	# 업로드한 파일 권한 변경
+	chmod 755 /etc/rc.d/init.d/storm-nimbus
+	chmod 755 /etc/rc.d/init.d/storm-supervisor
+	chmod 755 /etc/rc.d/init.d/storm-ui
+
+	# 서비스 등록 스크립트에 대한 Log 및 Pid 디렉터리 생성
+	mkdir /var/log/storm
+	mkdir /var/run/storm
+
+	# 세 파일에 대해 아래의 service/chkconfig 등록 명령 실행
+	service storm-nimbus start
+	service storm-supervisor start
+	service storm-ui start
+
+	# 스톰 정상 구동 확인
+	service storm-nimbus status
+	service storm-supervisor status
+	service storm-ui status
+
+	# 스톰 UI에 접속해서 스톰의 중요 상태 모니터링 가능
+	http://server02.hadoop.com:8087
+
+

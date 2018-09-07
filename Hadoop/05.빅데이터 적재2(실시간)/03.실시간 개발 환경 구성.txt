@@ -16,3 +16,9 @@
 	# 스톰 Topology 재배포
 	storm kill DriverCarInfo
 	storm jar bigdata.smartcar.storm-1.0.jar com.wikibook.bigdata.smartcar.storm.SmartCarDriverTopology DriverCarInfo
+
+==============================
+이클립스가 실행되면 프로젝트내 pom.xml 파일을 참조하여 라이브러리를 다운받는다.
+
+Maven 은 빌드 툴이다.
+==============================

@@ -51,6 +51,12 @@ ls      # 파일
 vi ifcfg-eth0   # 파일 열기
 insert 누르고 OnBOOT=no -> yes 변경후 ESC 누르고 :wq 하고 나온다. # 저장
 
+# CentOS 리눅스가 자동으로 설정한 네트워크 룰을 삭제
+vi /etc/udev/rules.d/70-persistent-net.rules
+# PCI device 0x8086:0x100e (e1000)
+# SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:c4:e9:b7", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
+전체 주석 처리
+
 service network restart     # 네트워크 재시작
 
 /etc/init.d/network restart # 네트워크 재시작
@@ -59,6 +65,20 @@ sync # 메모리에 있는거 남기지 말고 실행
 reboot  # 시스템 재시작
 
 5. 리눅스 패키지 설치
+# SSH 접속을 위한 패키지 설치
+yum install openssh*
+service sshd restart
+chkconfig sshd on
+reboot
+(리부팅 완료후)
+service network restart
+/
+ps -ef | grep sshd  # sshd 프로세스 전체 출력
+ssh root@IP주소  # 시큐어셀 원격 접속
+pass: manager
+/
+
+# 패키지 설치
 yum repolist
 yum update
 yum -y install rdate
@@ -70,11 +90,7 @@ yum -y install cmake
 yum -y install net-tools
 yum -y install bind-utils
 yum -y install psmisc
-/
-ps -ef | grep sshd  # sshd 프로세스 전체 출력
-ssh root@IP주소  # 시큐어셀 원격 접속
-pass: manager
-/
+
 
 6. 접속 계정 생성
 useradd -g wheel datamaster     # 유저 만들기
@@ -110,7 +126,7 @@ SELINUX=enforcing 을 SELINUX=disabled
 ps -ef | grep iptables
 (iptables 는 방화벽 프로그램)
 
-//
+======= 참고 ===============
 kill -9 # 9번 시그널(kill)을 보내라.
 
 /etc/init.d/iptables start  # 프로세스 시작
@@ -118,18 +134,24 @@ kill -9 # 9번 시그널(kill)을 보내라.
 
 chkconfig  # 리눅스가 시작될때 자동으로 실행되는 데몬 프로그램 출력
 chkconfig iptables off
-//
+=============================
 
 /etc/init.d/iptables stop
+or
+service iptables stop
+
 chkconfig iptables off
 chkconfig ip6tables off
 
+sysctl -w vm.swappiness=100
 vi /etc/sysctl.conf
-#vm.swappiness = 10  를  추가하고 저장한다.
+#vm.swappiness = 100  를 아래 추가하고 저장
 
 vi /etc/rc.local
-#/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag
-#/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled  를 추가하고 저장한다.
+#/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled  를 추가하고 저장한다.
+
+##/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag   <- ppt에 있고 책에 없는 내용
+##/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
 
 vi /etc/security/limits.conf
 '''
@@ -144,13 +166,6 @@ root hard nproc 32768
 *    hard nproc 32768
 '''
 를  추가하고 저장한다.
-
-
-vi /etc/udev/rules.d/70-persistent-net.rules
-
-# PCI device 0x8086:0x100e (e1000)
-# SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:c4:e9:b7", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
-를  주석 처리한다.
 
 reboot
 서버 종료
@@ -174,6 +189,12 @@ ls -a
 vi ifcfg-eth0
 DEVICE, HWADDR 부분 동기화
 
+# CentOS 리눅스가 자동으로 설정한 server01의 네트워크 룰을 삭제
+vi /etc/udev/rules.d/70-persistent-net.rules
+# PCI device 0x8086:0x100e (e1000)
+# SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:c4:e9:b7", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
+전체 주석 처리
+
 ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
 mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
 
@@ -191,6 +212,8 @@ ip 확인
 =====================
 3번 프로젝트 복사 -> 위와같이 세팅
 ============================
+
+######################### 전체 세팅 #################################
 
 [메모장]
 # ip를 셋팅하기위한 조건
@@ -267,6 +290,8 @@ lx02, lx03 도 lx01 ip 로 변경
 
 접속할때 http://lx01(ip):7180/cmf/hardware/hosts
 
+###################################################################
+
 ----------------
 
 /etc/init.d/network restart     # 네트워크 재시작
@@ -279,3 +304,7 @@ Xshell 에서 새로만들기
 사용자 인증탭: 사용자 이름: root
 --------------
 
+# 전체 환경 설정 완료후 버추얼 박스 메모리 재설정, RAM 16G 기준
+server01: 5120
+server02: 5120
+server03: 3072

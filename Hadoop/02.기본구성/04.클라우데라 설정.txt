@@ -10,17 +10,21 @@
 
 3. HDFS 설정
 	HDFS 클릭 -> 구성 ->
-	Replication Factor(dfs.replication): 2
-	Check HDFS Permissions(dfs.permissions): 체크해제
-	HDFS Block Size(dfs.block.size, dfs.block.size): 64MB
+	Replication Factor(dfs.replication): 2  # 복제 계수
+	Check HDFS Permissions(dfs.permissions): 체크해제   # HDFS 권한 검사
+	HDFS Block Size(dfs.block.size, dfs.block.size): 64MB   # HDFS 블록 크기
 
 4. YARN 설정
-	Container Memory Maximum(yarn.scheduler.maximum-allocation-mb): 1.5 GiB
-	Container Memory(yarn.nodemanager.resource.memory-mb): 5Gib
-	Scheduler Class(yarn.resourcemanager.scheduler.class): org...fifo.FifoScheduler
+	Container Memory Maximum(yarn.scheduler.maximum-allocation-mb): 1.5 GiB # 최대 컨테이너 메모리
+	Container Memory(yarn.nodemanager.resource.memory-mb): 5Gib # 컨테이너 메모리
+	Scheduler Class(yarn.resourcemanager.scheduler.class): org...fifo.FifoScheduler # scheduler class
 
 5. 클러스터 재실행 (Cluster 1 -> Restart)
-	클라이언트 구성 재배포 -> 클라이언트 구성 배포 -> 완료
+	# 전체 클러스터 재실행
+	CM 홈 -> Cluster1 콤보박스 -> 재시작
+
+	# HDFS 구성 재배포
+	HDFS -> 클라이언트 구성 재배포 아이콘 클릭 -> 클라이언트 구성 배포 -> 완료
 
 6. 샘플파일 업로드
 	파일질라:
@@ -31,26 +35,43 @@
 		사용자: root
 		비밀번호: 비밀번호
 
-		/home/datamaster/test-data/ <- Sample.txt 파일 복사
+		/home/bigdata/ <- Sample.txt 파일 복사
 
-	HDFS에 파일 저장
-		hdfs dfs -put Sample.txt /tmp
+	# HDFS에 파일 저장
+	[server02]
+	cd /home/bigdata
+	hdfs dfs -put Sample.txt /tmp
 
-	저장된 파일 확인
-		hdfs dfs -ls /tmp
+	# 저장된 파일 확인
+	hdfs dfs -ls /tmp
 
-	저장된 파일 읽기
-		hdfs dfs -cat /tmp/Sample.txt
+	# 저장된 파일 읽기
+	hdfs dfs -cat /tmp/Sample.txt
 
-	저장된 파일 상태
-		hdfs dfs -stat '%b %o %r %u %n' /tmp/Sample.txt
+	# 저장된 파일 상태
+	hdfs dfs -stat '%b %o %r %u %n' /tmp/Sample.txt
 
-	저장된 파일 이름 바꾸기
-		hdfs dfs -mv /tmp/Sample.txt /tmp/Sample.txt.bak
-		hdfs dfs -ls /tmp
+	# 저장된 파일 이름 바꾸기
+	hdfs dfs -mv /tmp/Sample.txt /tmp/Sample2.txt
+	hdfs dfs -ls /tmp
 
-	hdfs 검사
-		hdfs fsck /
+	# hdfs 검사
+	hdfs fsck /
+	# 파일 시스템 전체 상태 출력
+	hdfs dfsadmin -report
+	# CORRUPT, MISSING 항목에 숫자가 있을경우
+	# 안전모드 해제
+	hdfs dfsadmin -safemode leave
+	# 손상된 파일 강제 삭제
+	hdfs fsck / -delete
+	# 손상된 파일 /lost + found 디렉토리로 이동
+	hdfs fsck / -move
+
+	# HDFS에 저장된 파일 로컬 파일시스템으로 가져오기
+	hdfs dfs -get /tmp/Sample2.txt  # 로컬 /home/pilot-pjt/ 디렉터리에 Sample2.txt 파일 생성
+
+	# HDFS의 저장한 파일 삭제(휴지통)
+	hdfs dfs -rm /tmp/Sample2.txt   # 휴지통에 들어가고 24시간 이내에 복구 가능
 
 7. 주키퍼 클라이언트 명령을 이용한 설치 확인
 	# zookeeper-client 실행
@@ -58,7 +79,7 @@
 	zookeeper-client
 
 	# 주키퍼 Z노드 등록/조회/삭제
-	: create /pilot-pjt bigdata
-	: ls /
-	: get /pilot-pjt
-	: delete /pilot-pjt
+	] create /pilot-pjt bigdata
+	] ls /
+	] get /pilot-pjt
+	] delete /pilot-pjt

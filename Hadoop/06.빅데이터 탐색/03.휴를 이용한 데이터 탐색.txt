@@ -1,0 +1,220 @@
+1. 휴를 이용해 스마트카 데이터 탐색
+	# 휴 접속
+	http://server02.hadoop.com:8888/
+	or
+	CM 홈 -> Hue -> Hue 웹 UI 메뉴 클릭
+	ID,PASS: admin 접속
+
+	# 휴의 빠른 시작 마법사 구성
+	다음 -> ... 다음 클릭 -> 완료
+
+2.  HDFS에 적재된 데이터 확인
+	메뉴 클릭 -> 브라우저 -> 파일 클릭
+
+	# 파일럿 프로젝트 적재 경로로 이동, 플럼에서 수집한 데이터를 1차로 적재한 곳
+	/pilot-pjt/collect/car-batch-log/wrk_date=20180905
+	파일확인
+
+3. HBase에 적재된 데이터 확인
+	메뉴 클릭 -> 브라우저 -> HBase 클릭
+	DriverCarInfo 테이블 확인    # 상세 정보를 보면 로우키를 기준으로 적재된 스마트카 운전자의 운행 정보 확인 가능
+
+4. 하이브를 이용한 External 데이터 탐색
+	# /pilot-pjt/collect/car-batch-log/wrk_date=20180905 여기는 플럼에서 수집한 1차 적재 장소이며 하이브 External 영역에 해당한다.
+	# 하이브를 이용해 이곳의 데이터를 탐색하기 위해서는 적재된 데이터를 하이브의 테이블 구조와 매핑시킨 메타 정보가 필요
+	# 하이브 쿼리 예제 CH06/HiveQL/2nd
+	상단 [쿼리] 콤보박스 -> 편집기 -> Hive 클릭
+
+	# 하이브 쿼리를 이용해 스마트카 상태 정보를 탐색하기 위한 하이브의 External 테이블을 생성하고 실행
+	하이브 쿼리 예제 CH06/HiveQL/2nd/그림-6.49.hql -> 하이브 쿼리 브라우저로 드래그 앤 드랍
+	or
+	하이브 쿼리 예제 CH06/HiveQL/2nd/그림-6.49.hql -> 내부 코드 복사 붙여넣기
+	=============[내부코드]===================
+	create external table if not exists SmartCar_Status_Info (
+reg_date string,
+car_number string,
+tire_fl string,
+tire_fr string,
+tire_bl string,
+tire_br string,
+light_fl string,
+light_fr string,
+light_bl string,
+light_br string,
+engine string,
+break string,
+battery string
+)
+partitioned by( wrk_date string )
+row format delimited
+fields terminated by ','
+stored as textfile
+location '/pilot-pjt/collect/car-batch-log/'
+==========================================
+	실행(Excute 아이콘 클릭)
+	# 6.49 쿼리 설명 - 앞서 적재한 "스마트카 상태 정보"의 파일 위치, 형식, 구조 등의 정보를 하이브 테이블로 정의
+	# 스키마가 없는 데이터 파일을 하이브의 스키마로 정의해 하이브의 메타스토어에 등록하는 것
+	# 이 작접을 하고 나면 하이브 QL로 해당 파일에 접근 가능
+	# (쉽게 말하면 하이브 형식으로 등록?)
+
+	# Alter Table 명령을 실행하여 작업일자를 기준으로 파티션 정보를 생성
+	ALTER TABLE SmartCar_Status_Info ADD PARTITION(wrk_date='20180905');    # 개인별 파일럿생성 작업일자로 입력
+	실행(Excute 아이콘 클릭)
+	# 파티션 정보는 하이브의 메타스토어에서 관리되는데 파티셔닝 대상 데이터가 적재되면 그에 해당하는 하이브 테이블에 Add Partition을 반드시 수행해야 한다.
+
+	# 하이브의 External 테이블로 만들어진 SmartCar_Status_Info 테이블에서 단순 SELECT 쿼리를 실행, limit로 조회개수 제한, 조건절이 없는 단순 쿼리는 limit 절을 이용하면 빠른 조회가 가능하다.
+	select * from SmartCar_Status_Info limit 5;
+	실행(Excute 아이콘 클릭)
+
+	====[참고]=====
+	쿼리 작성할때 Ctrl + 스페이스바 누르면 자동완성 기능 사용 가능
+	===============
+
+	# 조건절을 포함하는 하이브 쿼리 실행, 스마트카의 배터리 상태가 60 이하였던 차량들을 찾고, 배터리 평균값도 구한다.
+	====[내부코드]=========
+	select car_number, avg(battery) as battery_avg
+from SmartCar_Status_Info
+where battery < 60
+group by car_number;
+=========================
+	실행(Excute 아이콘 클릭)
+
+	# 실행된 하이브 쿼리 모니터링은 [Job Browser] 메뉴를 통해 변환 실행된 맵리듀스 정보로 확인할 수 있다.
+	메뉴 -> Job 클릭 -> 상단 Workflow 탭 클릭
+
+
+5. 하이브를 이용한 HBase 데이터 탐색
+	# 하이브QL로 HBase 테이블을 탐색
+	# 상단 메뉴 [쿼리] 콤보박스 -> 편집기 -> Hive 클릭
+	# HBaseStorageHandler를 이용해 SmartCar_Drive_Info 테이블을 생성
+	=======[내부코드]=========
+	CREATE EXTERNAL TABLE SmartCar_Drive_Info(
+  r_key string,
+  date string,
+  car_number string,
+  speed_pedal string,
+  break_pedal string,
+  steer_angle string,
+  direct_light string,
+  speed string,
+  area_number string)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES (
+ "hbase.columns.mapping" = "cf1:date,cf1:car_number,
+                            cf1:speed_pedal,
+                            cf1:break_pedal,
+                            cf1:steer_angle,
+                            cf1:direct_light,
+                            cf1:speed,
+                            cf1:area_number")
+TBLPROPERTIES(
+  "hbase.table.name" = "DriverCarInfo");
+	=================================
+	실행(Excute 아이콘 클릭)
+	# 11번째 라인: 저장 방식을 HBaseStorageHandler로 정의
+	# 13 ~ 21 라인: 5장에서 만든 HBase의 DriverCarInfo 테이블과 칼럼 패밀리에 해당하는 필드 정보를 하이브 테이블과 매핑 생성
+	# SmartCar_Drive_Info 테이블이 하이브의 메타스토어에 만들어졌을 테고, 하이브 쿼리를 통해 HBase에 적재된 데이터를 탐색가능
+
+	# 실행 결과 확인
+	select * from SmartCar_Drive_Info limit 10;
+	실행(Excute 아이콘 클릭)
+
+
+6.데이터셋 추가
+	# "스마트카 마스터 데이터" , "스마트카 차량용품 구매 이력 데이터" 추가 적재
+	# CH06/ CarMaster.txt, CarItemBuyList_201606.txt 를 휴 파일 브라우저의 업로드 기능을 이용해 적재하고 하이브의 External Table로 정의한다.
+	메뉴 -> 브라우저 -> 파일 클릭
+	디렉터리: /pilot-pjt/collect 이동
+	car-master 디렉터리 추가 생성 -> car-master 디렉터리로 이동
+	CarMaster.txt 파일 해당 디렉터리에 업로드
+	업로드 파일 확인
+	# 스마트카 마스터 데이터셋의 스키마 구조는 "|"(파이프)로 분리되어 총 9개의 항목이 있다.
+	# "차량번호"|"성별"|"나이"|"결혼여부"|"지역"|"직업"|"차량용량"|"차량연식"|"차량모델"
+
+	# 두번째 데이터셋 같은 방식으로 업로드
+	디렉터리: /pilot-pjt/collect 이동
+	buy-list 디렉터리 추가 생성 -> buy-list 디렉터리로 이동
+	CarItemBuyList_201606.txt 파일 해당 디렉터리에 업로드
+	업로드 파일 확인
+	# 스마트카의 상품 구매 이력 데이터셋의 스키마 구조는 ","(콤마)로 분리되고 총 4개의 항목이 있다.
+	# "차량번호","구매 상품코드","만족도(1-5)","구매월"
+
+	# 추가한 두개의 데이터셋 "스마트카 마스터" , "스마트카 상품 구매 이력" 을 하이브의 External 테이블로 정의
+	# 상단 메뉴 [쿼리] 콤보박스 -> 편집기 -> Hive 클릭
+	========[내부 코드]=============
+	CREATE EXTERNAL TABLE SmartCar_Master (
+car_number string,
+sex string,
+age string,
+marriage string,
+region string,
+job string,
+car_capacity string,
+car_year string,
+car_model string
+)
+row format delimited
+fields terminated by '|'
+stored as textfile
+location '/pilot-pjt/collect/car-master'
+================================
+	실행
+
+	# "스마트카 마스터" 테이블 확인
+	select * from smartcar_master
+	실행
+
+	# "스마트카 차량용품 구매 이력"에 대한 하이브 테이블 SmartCar_Item_BuyList 생성
+	======[내부 코드]=========
+CREATE EXTERNAL TABLE SmartCar_Item_BuyList (
+car_number string,
+Item string,
+score string,
+month string
+)
+row format delimited
+fields terminated by ','
+stored as textfile
+location '/pilot-pjt/collect/buy-list'
+=============================
+	실행
+	# 10라인: "스마트카 용품 구매이력" 파일의 경로를 지정
+
+	# "스마트카 상품 구매 이력" 테이블의 데이터 확인
+	select * from smartcar_item_buylist limit 10;
+
+
+7.스파크를 이용한 추가 데이터셋 탐색
+	# "스마트카 마스터 데이터"를 스파크-SQL을 이용해 탐색
+	# Spark-Shell 사용
+	[server02]
+	spark-shell
+	# 기동 완료되면 scala> 프롬프트가 나타난다.
+
+	# 스파크-SQL 컨텍스트를 이용해 하이브에서 생성한 "스마트카 마스터 데이터"인 SmartCar_Master 테이블을 조회할수 있다.
+	# "Age >= 18" 조건으로 스파크 SQL 컨텍스트를 정의해 스파크 DataFrame 변수인 smartcar_master_df에 할당
+	> val smartcar_master_df = sqlContext.sql("SELECT * from SmartCar_Master where age >= 18")
+
+=========================================== 오류남 =======================================================
+
+	# Age가 18 이상으로 만들어진 DataFrame 출력
+	> smartcar_master_df.show() # 오류
+
+	# Age가 18세 이상으로 정제된 데이터셋을 하이브의 Managed 테이블인 SmartCar_Master_Over18에 별도로 저장
+	> smartcar_master_df.saveAsTable("SmartCar_Master_Over18")  # 출력 오류, 파일은 생성됨
+
+==========================================================================================================
+
+	# 휴 -> [쿼리] -> Hive 편집기로 이동해서 스파크-SQL에서 만든 테이블인 SmartCar_Master_Over18이 생성됐는지 확인하고, SmartCar_Master_Over18에 "Age > 18" 에 해당하는 데이터만 존재하는지 하이브 QL로 조회한다.
+	Select * from SmartCar_Master_Over18 where Age > 18 limit 10
+	실행
+
+	# 아래 쿼리를 실행했을때 하이브와 스파크 실행했을때 수행 시간 비교, 하이브: 62초, 스파크: 20초
+	select * from SmartCar_Master_Over18 where age > 30 and sex = '남'
+	실행
+
+
+
+
+
+

@@ -1,0 +1,179 @@
+- 하이브의 External 에는 2018년 09월 05일 날짜로 적재한 "스마트카 상태 정보 데이터"가 적재돼 있다. 이 데이터를 우지 워크플로를 이용해 Managed 영역으로 매일 옮기고, 이때 "스마트카 마스터 데이터"와 Join을 통해 데이터를 확장하는 작업을 한다.
+- 워크플로의 하이브 작업에 사용될 하이브 QL은 CH06/HiveQL/2nd 디렉토리에 있다.
+
+1.주제역역 1에서 사용할 작업 디렉터리를 만든다.
+	휴 -> 메뉴 -> 브라우저 -> 파일 클릭
+	디렉토리 위치: /pilot-pjt
+	새로만들기 -> 디렉토리 선택 -> 폴더명: workflow
+	workflow 하위폴더 생성, 폴더명: hive_script
+	hive_script 하위폴더 생성, 폴더명: subject1, subject2, subject3, subject4, subject5
+
+2.주제영역 1에서 사용할 하이브 스크립트파일 3개 생성.
+	 /pilot-pjt/workflow/hive_script/subject1 로 이동
+	 새로만들기 -> 파일 -> 파일명: create_table_managed_smartcar_status_info.hql
+	 생성된 파일 클릭 -> 좌측 [파일 편집] 클릭
+	 아래 코드 입력
+	 ===========[내부코드]========================
+create table if not exists Managed_SmartCar_Status_Info (
+car_number string,
+sex string,
+age string,
+marriage string,
+region string,
+job string,
+car_capacity string,
+car_year string,
+car_model string,
+tire_fl string,
+tire_fr string,
+tire_bl string,
+tire_br string,
+light_fl string,
+light_fr string,
+light_bl string,
+light_br string,
+engine string,
+break string,
+battery string,
+reg_date string
+)
+partitioned by( biz_date string )
+row format delimited
+fields terminated by ','
+stored as textfile;
+==================================================
+	저장
+
+	# 같은 위치에 두번째 하이브 스크립트 파일 생성
+	새로만들기 -> 파일 -> 파일명: alter_partition_smartcar_status_info.hql
+	해당 파일 클릭 -> 편집 -> 아래 코드 입력
+	======[내부코드]=========
+	alter table SmartCar_Status_Info add if not exists partition(wrk_date='${working_day}');
+	# ${working_day} = 동적 파티션값, 해당 값은 우지 Coordinator의 매개변수인 "today"에 할당된 값으로부터 가져온다.
+	=========================
+	저장
+
+	# 같은 위치에 세번째 하이브 스크립트 파일을 만든다.
+	새로만들기 -> 파일 -> 파일명: insert_table_managed_smartcar_status_info.hql
+	해당 파일 클릭 -> 편집 -> 아래코드 입력
+	# 동적 파티션을 생성하기 위한 하이브 환경변수 값을 설정, 동적 파티션은 지정된 특정 필드값을 기준으로 자동 파티션되는 기능이고, 다음의 옵션을 반드시 지정해야 한다. set hive.exec.dynamic.partition=true; set hive.exec.dynamic.partition.mode=nonstrict;
+	==================[내부 코드]========================
+	# External 영역에 생성돼 있는 두 테이블인 SmartCar_Master_Over18과 SmartCar_Status_Info 를 조인해서 조회된 데이터를 앞서 만든 Managed 테이블인 Managed_SmartCar_Status_Info에 삽입하는 하이브 스크립트
+set hive.exec.dynamic.partition=true;
+set hive.exec.dynamic.partition.mode=nonstrict;
+
+insert overwrite table Managed_SmartCar_Status_Info partition(biz_date)
+select
+ t1.car_number,
+ t1.sex,
+ t1.age,
+ t1.marriage,
+ t1.region,
+ t1.job,
+ t1.car_capacity,
+ t1.car_year,
+ t1.car_model,
+ t2.tire_fl,
+ t2.tire_fr,
+ t2.tire_bl,
+ t2.tire_br,
+ t2.light_fl,
+ t2.light_fr,
+ t2.light_bl,
+ t2.light_br,
+ t2.engine,
+ t2.break,
+ t2.battery,
+ t2.reg_date,
+ substring(t2.reg_date, 0, 8) as biz_date
+from  SmartCar_Master_Over18 t1 join SmartCar_Status_Info t2
+on t1.car_number = t2.car_number and t2.wrk_date = '${working_day}';
+=====================================
+	저장
+
+	휴 -> 상단메뉴 [쿼리] 콤보박스 -> 스케줄러 -> Workflow -> [문서(역삼각형)] 클릭 -> 작업 클릭
+	# 주제영역 1의 데이터를 관리하기 위해 Managed 영역에 하이브 테이블을 만드는 작업을 추가한다.
+	워크플로 작업 툴 박스 에서 "Hive Server2 스크립트" 아이콘 드래그 -> [여기에 작업 두기] 에 드롭
+	# 사용할 Hive Server2 스크립트 파일 선택
+	앞 단계에서 만든 pilot-pjt/workflow/hive_script/subject1 에 있는 create_table_managed_smartcar_status_info.hql 선택 -> 추가 버튼 클릭
+
+	# 데이터를 가져올 External 영역의 SmartCar_Status_Info 테이블에 오늘 날짜로 파티션 정보를 설정하는 하이브 작업을 생성.
+	워크플로 작업 툴 박스 에서 "Hive Server2 스크립트" 아이콘 드래그 -> 첫번째 작업 바로 아래 드롭
+	# 사용할 Hive Server2 스크립트 파일 선택
+	앞 단계에서 만든 pilot-pjt/workflow/hive_script/subject1 에 있는 alter_partition_smartcar_status_info.hql 선택 -> 추가 버튼 클릭
+
+	# 작업일자(수집일자) 매개변수인 ${working_day}의 값을 워크플로 매개변수와 연결. working_day 매개변수에 ${today}를 설정하는데 우지의 예약 스케줄러에서 정의해 등록한다.
+	2번째 작업 매개변수 항목: working_day=${today} 입력
+	# working_day의 값으로는 워크플로가 실행되는 시점에 YYYYMMDD 형식의 날짜값이 들어온다. 임의의 값을 강제로 설정하고 싶다면 "working_day=20160101" 처럼 날짜를 입력한다.
+
+	# 데이터를 가져올 External 영역의 SmartCar_Status_Info 테이블에 오늘 날짜로 파티션 정보를 설정하는 하이브 작업을 생성.
+	워크플로 작업 툴 박스 에서 "Hive Server2 스크립트" 아이콘 드래그 -> 두번째 작업 바로 아래 드롭
+	# 사용할 Hive Server2 스크립트 파일 선택
+	앞 단계에서 만든 pilot-pjt/workflow/hive_script/subject1 에 있는 insert_table_managed_smartcar_status_info.hql 선택 -> 추가 버튼 클릭
+	3번째 작업 매개변수 항목: working_day=${today} 입력
+
+	# 워크플로 이름 지정
+	작업 내역 상단 My Workflow 클릭 -> "Subject 1 - Workflow" 변경 -> 확인 클릭
+
+	# 저장
+	상단 저장 아이콘 클릭
+
+	# 작성한 워크플로를 작동하기 위한 Coordinator 를 생성
+	[Hue 3 버전]
+	상단 메뉴 -> Workflows -> 편집기 -> Coordinator 클릭 -> 생성 클릭
+	[Hue 4 버전]
+	상단 메뉴 [쿼리] 콤보박스 -> 스케줄러 -> 예약 클릭
+
+	# 제목 입력
+	My Chedule 이름 클릭 -> "Subject1 - Coordinator" 으로 변경
+
+	# Coordinator가 사용할 워크플로 선택
+	[Workflow 선택...] 클릭 -> 앞에서 만든 워크플로 (Subject 2 - Workflow) 선택
+
+	# Coordinator는 워크플로를 주기적으로 실행하기 위한 일종의 배치 잡 스케줄러다.
+	# 스케줄러 값 변경
+	다음 마다: "일", 다음에서: "1":"0"
+	옵션 클릭
+		시간대: "Asia/Seoul"
+		원본: "2018-09-05"(수집일), 시계 아이콘:"00:00"
+		->  "2018-12-31", 시계 아이콘:"23:59"
+	# 위 설정은 2018년 09월 05일부터 2018년 12월 31일 까지, 매일 새벽 01시에 Coordinator와 연결돼 있는 워크플로가 작동한다.
+	# "UTC 시간만 해당됩니다..." 라는 메시지는 "Asia/Seoul"의 타임존을 설정했기 때문에 무시해도 된다.
+
+	# 워크플로 즉시 실행하기 => 매개변수 일자를 직접 입력하고 저장 -> 제출 클릭
+
+	# 워크플로에서 사용할 매개변수인 today 값 설정
+	# 앞서 워크플로의 하이브 작업에서 작업일자(수집일자) 매개변수를 "working_day=${today}"로 등록했다. today의 값을 Coordinator의 내장 함수를 통해 다음과 같이 설정한다.
+	${coord:formatTime(coord:dateTzOffset(coord:nominalTime(), "Asia/Seoul"), 'yyyyMMdd')}
+	저장
+	제출
+
+	# 제출된 Coordinator 상태 확인
+	[Hue 3]
+	휴 -> Workflows -> 대시보드 -> Coordinator
+	[hue 4]
+	휴 -> 상단 Job 클릭 -> 일정 클릭
+
+	# 워크플로가 작동하면 워크플로에서 정의된 잡이 시작되며, 우측 상단 Job 에서 실행 중인 잡의 개수가 표시된다.
+
+	# "Subject 1 - Workflow"가 정상적으로 작동됐는지 확인
+	휴 -> Hive Editor -> QL 입력
+	# "biz_date=20180905"의 날짜는 각자의 파일럿 환경의 실행 일자에 맞춰 입력
+	# 앞서 워크플로를 통해 만들어지는 managed_smartcar_status_info 테이블이 휴의 Hive Editor에 곧바로 표기되지 않아 하이브 QL 실행 에러가 발생하면 좌측의 테이블 리프레시를 누른다.
+	======[내부 코드]=========
+select * from managed_smartcar_status_info
+where biz_date = '20180905' limit 10
+	==========================
+	실행
+
+	# 한번 등록한 Coordinator는 종료 기간까지 계속 활성화된 상태로 남아 있게 되어 파일럿 PC의 리소스를 차지하게 된다.
+	# 파일럿 환경에서는 매일 워크플로가 실행될 필요가 없으니 실행 및 테스트가 끝난 잡은 상단의 [Workflows] -> 대시보드 -> Coordinator 메뉴를 선택하고, 실행 중인 잡을 선택해서 모두 종료한다.
+
+
+
+
+
+
+
+
+

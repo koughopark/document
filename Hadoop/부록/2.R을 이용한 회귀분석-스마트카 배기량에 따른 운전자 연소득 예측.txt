@@ -1,0 +1,163 @@
+- 회귀분석은 보통 수치형 독립변수의 변화에 따른 수치형 종속변수의 값을 예측할 때 사용하는 선형 회귀분석과 수치형 독립변수의 변화에 따른, 범주형 종속변수의 범주를 예측할 때 사용하는 로지스틱 회귀분석으로 나뉜다.
+- 독립변수는 분석중에 사용될 입력값(스마트카 배기량)을 의미하며, 종속변수는 예측할 분석 결과값(스마트카 운전자 연소득)을 말한다.
+
+# 선형 회귀분석의 기본 원리
+- 입력값(X)와 결과값(Y)의 데이터 관계가 선형을 이루는건 알고 있지만 정확한 기울기 값을 정의하는 모델을 찾고자 할 때 사용한다.
+- 임의의 회귀선을 긋고 기울기와 편향값이 업데이트되면서 회귀선이 이동하는데, 각 점간의 거리에 대한 평균값이 최소가 되는 회귀선에서 이동을 멈추게 되고 이것이 최적의 선형 회귀 모델이 되는것이다.
+
+# 로지스틱 회귀분석의 기본 원리
+- 결과값을 "0"과 "1"로 가지는 시그모이드 함수를 쓴다.
+- 임의의 시그모이드 선을 긋고 각 점 간의 거리에 대한 평균 또는 엔트로피를 비교해가며 최적의 로지스틱 회귀 모델을 찾는다.
+
+1. R 설치 및 환경 구성
+	R 다운로드 및 설치: https://www.r-project.org
+	R-Studio 다운로드 및 설치: https://www.rstudio.com/
+
+2. R 활용방안
+	# R을 이용해 회귀분석을 하기 위해 하이브의 데이터웨어하우스에 새로운 데이터셋인 "스마트카 고객마스터2" 데이터를 추가로 적재한다.
+	# 해당 데이터셋은 스마트카 운전자의 연소득이 포함된 로컬 파일시스템의 데이터로서 하이브의 로컬 데이터 로드 기능을 이용해 하이브 테이블로 로드하면 된다.
+	# 이렇게 하이브에 생성된 데이터셋은 R의 RJDBC를 이용해 R 응용 프로그램에서 하이브의 테이블에 직접 접근할 수 있다.
+	# 여기서는 기본적인 데이터 탐색을 수행한 후 스마트카의 배기량에 따른 운전자의 연소득 구간이 어떻게 변하는지 회귀분석을 해보자.
+
+3. R 파일럿 실행 1단계 - 분석 데이터셋 생성
+	# 스마트카 운전자의 연소득 정보가 푸함된 "스마트카 고객 마스터2" 데이터를 하이브에 로드한다.
+	# "스마트카 고객 마스터2" 데이터의 상세 수집과정은 생략
+
+	# "스마트카 고객 마스터2" 파일을 server02에 업로드
+	파일럿 작업 경로: sftp://server02.hadoop.com/home/pilot-pjt/working
+	소스 경로: /부록.A/CarMaster2Income.txt
+
+	# 휴에서 하이브 에디터에 접속해 SmartCar_Master2Income 테이블을 생성
+	======[내부코드]============
+CREATE EXTERNAL TABLE SmartCar_Master2Income (
+car_number string,
+sex string,
+age string,
+marriage string,
+region string,
+job string,
+car_capacity int,
+car_year string,
+car_model string,
+income int
+)
+row format delimited
+fields terminated by '|'
+stored as textfile
+tblproperties ("skip.header.line.count"="1");
+==================================
+	실행
+	# "스마트카 고객 마스터2" 테이블 생성
+
+	# 로컬 파일시스템에 적재된 "스마트카 고객 마스터2.txt" 파일을 앞서 생성한 하이브 테이블인 SmartCar_Master2Income 에 직접 로드한다.
+	===========[내부코드]=========
+LOAD DATA LOCAL INPATH '/home/pilot-pjt/working/CarMaster2Income.txt' OVERWRITE INTO TABLE SmartCar_Master2Income;
+==================================
+	실행
+	# "스마트카 고객 마스터2" 테이블에 데이터 로드
+
+	# 하이브 테이블에 로컬파일이 정상적으로 로드됐는지 조회 쿼리를 실행해 본다.
+	========[내부코드]=========
+Select
+    car_number,
+    car_capacity,
+    income
+from SmartCar_Master2Income;
+===============================
+	실행
+
+
+2. R 파일럿 실행 2단계 - 하이브 클라이언트 라이브러리 구성
+	# R 응용 프로그램이 하이브의 테이블에 직접 접근하기 위해서는 하이브 클라이언트 라이브러리가 R의 클래스패스에 지정돼 있어야 한다.
+	# 파일럿 PC 상에서 특정 디렉터리를 만들고 관련 라이브러리를 복사해 놓은 후 이 디렉터리를 R의 클래스패스로 지정한다.
+
+	# 사용자의 파일럿 PC에 하이브 클라이언트 라이브러리를 관리하기 위한 두 개의 디렉터리를 생성한다.
+	C://hiveJar
+	C://hadoopJar
+
+	# server02로부터 관련 라이브러리를 다운로드한다. 총 8개의 Jar 파일로 하이브 클라이언트 라이브러리 파일 5개와 하둡 클라이언트 라이브러리 파일 3개다.
+	# server02에 FTP로 접속해 하이브 클라이언트 라이브러리 파일 5개를 C://hiveJar 디렉터리에 다운로드 한다.
+	# 아래의 Jar 파일을 hiveJar 디렉터리에 다운로드 한다.
+	/opt/cloudera/parcels/CDH/jars/hive-jdbc-1.1.0-cdh5.x.x.jar
+	/opt/cloudera/parcels/CDH/jars/hive-service-1.1.0-cdh5.x.x.jar
+	/opt/cloudera/parcels/CDH/jars/httpclient-4.x.jar
+	/opt/cloudera/parcels/CDH/jars/httpcore-4.x.jar
+	/opt/cloudera/parcels/CDH/jars/hive-jdbc-1.1.0-cdh5.x.x.-standalone.jar
+
+	# 하둡 클라이언트 라이브러리 파일 3개를 hadoopJar 디렉터리에 다운로드 한다.
+	/opt/cloudera/parcels/CDH/jars/hadoop-common-2.6.0-cdh5.x.x.jar
+	/opt/cloudera/parcels/CDH/jars/libthrift-0.9.x.jar
+	/usr/share/cmf/common_jars/hadoop-client-2.6.0-cdh5.x.0-20150401.090022-234.jar
+
+
+3. R 파일럿 실행 3단계 - R에서 하이브 데이터 로드
+	# R-Studio를 실행한 후 필요한 R 패키지를 추가로 설치하고, 하이브에 생성된 "스마트카 고객 마스터2" 데이터를 R의 응용 프로그램으로 로드
+	R-Studio 실행 -> 콘솔 입력창 확인
+
+	# 필요한 R 패키지 "DBI", "rJava", "RJDBC" 설치
+	> install.packages("DBI")
+	> install.packages("rJava")
+	> install.packages("RJDBC")
+
+	# 설치한 패키지 로드
+	> library("DBI")
+	> library("rJava")
+	> library("RJDBC")
+
+	# 파일럿 환경의 하이브 데이터웨어하우스에 접속해 "스마트카 고객 마스터2" 테이블인 "SmartCar_Master2Income" 테이블을 확인
+	# 앞서 만든 hiveJar, hadoopJar 디렉터리를 R의 클래스 패스로 설정한다
+	# 코드 소스는 /부록.A/R명령.txt 에 있다. <- 못찾겠다.
+	> hive.class.path = list.files(path=c("C://haveJar"), pattern="jar", full.names=T);
+	> hadoop.lib.path = list.files(path=c("C://hadoopJar"), pattern="jar", full.names=T);
+	> hadoop.class.path = list.files(path=c("C://hadoopJar"), pattern="jar", full.names=T);
+	> class.path = c(hive.class.path, hadoop.lib.path, hadoop.class.path);
+	> .jinit(classpath=class.path)
+
+	# 하이브의 JDBC 드라이버를 로드하고 server02에 설치돼 있는 하이브 서버 2로 접속한다.
+	# 접속 계정과 비밀번호는 브라우저를 통해 "http://server01.hadoop.com:7180/api/v11/clusters/Cluster 1/services/hive/config"에 접속하면 확인할수 있다.
+	http://server01.hadoop.com:7180/api/v11/clusters/Cluster 1/services/hive/config
+	하둡 접속 ID, Password 입력
+	# 웹브라우저에서 아래 내용 확인
+	  }, {
+	    "name" : "hive_metastore_database_name",
+	    "value" : "hive"
+	  }, {
+	    "name" : "hive_metastore_database_password",
+	    "value" : "NQGyDkQQ0S"
+	  }, {
+
+	 # 아래 명령을 통해 하이브 JDBC를 로드하고 하이브 서버 2에 연결
+	 > drv <- JDBC("org.apache.hive.jdbc.HiveDriver", "C://hiveJar/hive-jdbc-1.1.0-cdh5.15.1.jar", identifier.quote="`")
+	 > conn <- dbConnect(drv, "jdbc:hive2://server02.hadoop.com:10000/default", "hive", "NQGyDkQQ0S")   # 오류남
+
+	 # 하이브의 데이터 웨어 하우스에 생성된 테이블 목록을 조회한다.
+	 > dbListTables(conn);
+
+	 # 하이브의 "스마트카 고객 마스터2" 테이블에 질의하고 애용까지 확인
+	 > data <- dbGetQuery(conn, "select * from smartcar_master2income")
+	 > View(data)
+
+
+4. R 파일럿 실행 4단계 - 데이터 탐색 및 회귀모델 생성
+	# "스마트카 고객 마스터2"의 종속변수인 연소득(income) 필드를 R의 시각화 기능으로 탐색해 보고, 독립변수인 차량의 배기량 데이터와 함계 회귀모델을 생성한다.
+
+	# 히스토그램과 박스플롯 명령으로 "income" 데이터의 분포도를 파악하고, Q-Q 플롯 기능을 이용해 정규성을 확인한다.
+	> hist(data$smartcar_master2income.income)
+	> boxplot(data$smartcar_master2income.income)
+	> qqnorm(data$smartcar_master2income.income)
+	> qqline(data$smartcar_master2income.income)
+
+	# "스마트카 고객 마스터2" 데이터셋을 트레이닝 데이터셋으로 삼아 스마트카의 배기량에 따라 운전자의 연소득을 예측하는 회귀모델을 만들고 그 결과를 확인한다.
+	> model <- lm(data$smartcar_master2income.income~smartcar_master2income.car_capacity,data=data)
+	> summary(model)
+
+	# 생성된 회귀모델 테스트
+	# 테스트 데이터로 /부록.A/CarMaster2Income_Test.txt"파일을 이용한다.
+	CarMaster2Income_Test.txt 파일을 C://test_data 디렉터리를 만들어 복사한다.
+	> test_data <- read.csv("C://test_data/CarMaster2Income_Test.txt", sep="|", header=T, encoding = "UTF-8")
+	> predict(model, test_data, interval = "prediction")
+	# 결과 출력 - 왼쪽 fit 데이터가 회귀모델로 예측한 운전자의 연소득 정보이고, 우측이 해당 운전자의 실제 연소득 정보다.
+
+
+
+

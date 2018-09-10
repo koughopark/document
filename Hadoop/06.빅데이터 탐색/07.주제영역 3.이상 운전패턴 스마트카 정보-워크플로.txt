@@ -1,0 +1,170 @@
+- 주제 영역 3의 워크플로는 2018년 09월 05일에 스마트카 운전자의 운행 기록을 분석해서 과속, 급제동, 급회전이 빈번한 차량등을 스코어링한 마트 데이터를 생성한다.
+- 과속과 급제동의 경우, 당일(05일)의 차량별로 가속 페달과 브레이크 페달의 평균값을 구하고, 관련 표준편차 값은 과거의 모든 데이터를 대상으로 산출해서 과속/급제동 표준값이 각각 "2" 이상인 차량의 경우만 "비정상"인 차량으로 판단했다.
+- 급회전의 경우 당일(05일) 기준으로 Left/Right 회전각 "2-3" 단계를 "1000"번 이상 했을 경우 급회전이 빈번한 "비정상" 차량으로 지정했다.
+- 워크플로의 하이브 작업에 사용되는 하이브 QL은 /CH06/HiveQL/2nd 의 경로에서 제공
+
+
+1.주제3 작업 디렉터리로 이동
+	휴 -> 메뉴 -> 브라우저 -> 파일 클릭
+	/pilot-pjt/workflow/hive_script/subject3
+
+
+
+2.주제영역 3에서 사용할 하이브 스크립트파일 2개 생성.
+	 /pilot-pjt/workflow/hive_script/subject3 로 이동
+	 새로만들기 -> 파일 -> 파일명: create_table_managed_smartcar_symptom_info.hql
+	 생성된 파일 클릭 -> 좌측 [파일 편집] 클릭
+	 아래 코드 입력
+	 ===========[내부코드]========================
+create table if not exists Managed_SmartCar_Symptom_Info (
+car_number string,
+speed_p_avg string,
+speed_p_symptom string,
+break_p_avg string,
+break_p_symptom string,
+steer_a_cnt string,
+steer_p_symptom string,
+biz_date string
+)
+row format delimited
+fields terminated by ','
+stored as textfile;
+
+==================================================
+	저장
+	# 스마트카 운전자들의 운행 정보에서 이상 패턴을 관리하기 위한 테이블
+
+	# 같은 위치에 두번째 하이브 스크립트 파일 생성
+	새로만들기 -> 파일 -> 파일명: insert_table_managed_smartcar_symptom_info.hql
+	해당 파일 클릭 -> 편집 -> 아래 코드 입력
+	======[내부코드]=========
+insert into table Managed_SmartCar_Symptom_Info
+select
+       t1.car_number,
+       t1.speed_p_avg_by_carnum,
+       case
+         when (abs((t1.speed_p_avg_by_carnum - t3.speed_p_avg) / t4.speed_p_std))  >  2
+           then '비정상'
+         else   '정상'
+       end
+       as speed_p_symptom_score,
+       t1.break_p_avg_by_carnum,
+       case
+         when (abs((t1.break_p_avg_by_carnum - t3.break_p_avg) / t4.break_p_std))  >  2
+           then '비정상'
+         else   '정상'
+       end
+       as break_p_symptom_score,
+       t2.steer_a_count,
+       case
+         when (t2.steer_a_count)  >   1000
+           then '비정상'
+         else   '정상'
+       end
+       as steer_p_symptom_score,
+       t1.biz_date
+from
+       (select car_number, biz_date, avg(speed_pedal) as speed_p_avg_by_carnum, avg(break_pedal) as break_p_avg_by_carnum from managed_smartcar_drive_info where biz_date =  '${working_day}'  group by car_number, biz_date) t1
+join
+       (select car_number, count(*) as steer_a_count from managed_smartcar_drive_info where steer_angle in ('L2','L3','R2','R3') and biz_date =  '${working_day}'  group by car_number) t2
+on
+       t1.car_number = t2.car_number ,
+       (select avg(speed_pedal) as speed_p_avg, avg(break_pedal) as break_p_avg from managed_smartcar_drive_info ) t3,
+       (select stddev_pop(s.speed_p_avg_by_carnum) as speed_p_std, stddev_pop(s.break_p_avg_by_carnum) as break_p_std from
+                (select car_number, avg(speed_pedal) as speed_p_avg_by_carnum, avg(break_pedal) as break_p_avg_by_carnum from managed_smartcar_drive_info group by car_number) s) t4
+
+	=========================
+	저장
+	# 한번의 실행으로 "스마트카 운전자 운행정보(Managed_SmartCar_Drive_Info)"로 부터 차량 번호별 스피드 페달, 운전대, 브레이크 페달의 데이터 분석 결과를 Managed_SmartCar_Symptom_Info 테이블에 저장한다.
+	# 쿼리를 살펴보면 전체 평균과 표준편차 값을 구하고, 당일(05일)에 차량별 편차를 구해 이상 차량임을 판단하고 있는데, 이러한 처리 과정을 데이터의 피처 엔지니어링이라고 하며, 기존의 변수를 가공해 새로운 변수와 정보를 추가하는 과정에 해당한다.
+
+
+
+
+	휴 -> 상단메뉴 [쿼리] 콤보박스 -> 스케줄러 -> Workflow -> [문서(역삼각형)] 클릭 -> 작업 클릭
+
+	워크플로 작업 툴 박스 에서 "Hive Server2 스크립트" 아이콘 드래그 -> [여기에 작업 두기] 에 드롭
+	앞 단계에서 만든 pilot-pjt/workflow/hive_script/subject3 에 있는 create_table_smartcar_symptom_info.hql 선택 -> 추가 버튼 클릭
+
+	워크플로 작업 툴 박스 에서 "Hive Server2 스크립트" 아이콘 드래그 -> 첫번째 작업 바로 아래 드롭
+	앞 단계에서 만든 pilot-pjt/workflow/hive_script/subject3 에 있는 insert_table_managed_smartcar_symptom_info.hql 선택 -> 추가 버튼 클릭
+	2번째 작업 매개변수 항목: working_day=${today} 입력
+
+
+	# 워크플로 이름 지정
+	작업 내역 상단 My Workflow 클릭 -> "Subject 3 - Workflow" 변경 -> 확인 클릭
+
+	# 저장
+	상단 저장 아이콘 클릭
+
+	# 작성한 워크플로를 작동하기 위한 Coordinator 를 생성
+	[Hue 3 버전]
+	상단 메뉴 -> Workflows -> 편집기 -> Coordinator 클릭 -> 생성 클릭
+	[Hue 4 버전]
+	상단 메뉴 [쿼리] 콤보박스 -> 스케줄러 -> 예약 클릭
+
+	# 제목 입력
+	My Chedule 이름 클릭 -> "Subject3 - Coordinator" 으로 변경
+
+	# Coordinator가 사용할 워크플로 선택
+	[Workflow 선택...] 클릭 -> 앞에서 만든 워크플로 (Subject 3 - Workflow) 선택
+
+	# Coordinator는 워크플로를 주기적으로 실행하기 위한 일종의 배치 잡 스케줄러다.
+	# 스케줄러 값 변경
+	다음 마다: "일", 다음에서: "3":"0"
+	옵션 클릭
+		시간대: "Asia/Seoul"
+		원본: "2018-09-05"(수집일), 시계 아이콘:"00:00"
+		->  "2018-12-31", 시계 아이콘:"23:59"
+	# 위 설정은 2018년 09월 05일부터 2018년 12월 31일 까지, 매일 새벽 03시에 Coordinator와 연결돼 있는 워크플로가 작동한다.
+	# "UTC 시간만 해당됩니다..." 라는 메시지는 "Asia/Seoul"의 타임존을 설정했기 때문에 무시해도 된다.
+
+	# 워크플로 즉시 실행하기 => 매개변수 일자를 직접 입력하고 저장 -> 제출 클릭
+
+	# 워크플로에서 사용할 매개변수인 today 값 설정
+	# 앞서 워크플로의 하이브 작업에서 작업일자(수집일자) 매개변수를 "working_day=${today}"로 등록했다. today의 값을 Coordinator의 내장 함수를 통해 다음과 같이 설정한다.
+	${coord:formatTime(coord:dateTzOffset(coord:nominalTime(), "Asia/Seoul"), 'yyyyMMdd')}
+	저장
+	제출
+
+	# 제출된 Coordinator 상태 확인
+	[Hue 3]
+	휴 -> Workflows -> 대시보드 -> Coordinator
+	[hue 4]
+	휴 -> 상단 Job 클릭 -> 일정 클릭
+
+	# 워크플로가 작동하면 워크플로에서 정의된 잡이 시작되며, 우측 상단 Job 에서 실행 중인 잡의 개수가 표시된다.
+
+	# "Subject 3 - Workflow"가 정상적으로 작동됐는지 확인
+	휴 -> Hive Editor -> QL 입력
+	# "biz_date=20180905"의 날짜는 각자의 파일럿 환경의 실행 일자에 맞춰 입력
+	# 앞서 워크플로를 통해 만들어지는 Managed_SmartCar_Drive_Info 테이블이 휴의 Hive Editor에 곧바로 표기되지 않아 하이브 QL 실행 에러가 발생하면 좌측의 테이블 리프레시를 누른다.
+	======[내부 코드]=========
+SELECT
+    car_number,
+    cast(speed_p_avg as int),
+    speed_p_symptom,
+    cast(break_p_avg as float),
+    break_p_symptom,
+    cast(steer_a_cnt as int),
+    steer_p_symptom,
+    biz_date
+FROM managed_smartcar_symptom_info
+where biz_date = '20180905'
+
+	==========================
+	실행
+
+	# 한번 등록한 Coordinator는 종료 기간까지 계속 활성화된 상태로 남아 있게 되어 파일럿 PC의 리소스를 차지하게 된다.
+	# 파일럿 환경에서는 매일 워크플로가 실행될 필요가 없으니 실행 및 테스트가 끝난 잡은 상단의 [Workflows] -> 대시보드 -> Coordinator 메뉴를 선택하고, 실행 중인 잡을 선택해서 모두 종료한다.
+
+
+
+
+
+
+
+
+
+
+

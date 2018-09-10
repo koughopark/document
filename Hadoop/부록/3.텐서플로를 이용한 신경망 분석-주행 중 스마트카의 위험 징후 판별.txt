@@ -1,0 +1,158 @@
+- 데이터의 비선형 관계를 모델링한 신경망(Neural Networks) 분석이다.
+- 신경망도 머신러닝의 한 분야로서 감독학습에 해당하고 신경망을 여러 층으로 쌓아 구성한 심층 신경망을 딥러닝(Deep Learning)이라 부른다.
+- 딥러닝은 처리할 데이터 형식(음성, 이미지, 동영상, 텍스트 등) 과 패턴을 찾아내는 방식에 따라 크게 두 가지 알고리즘으로 나눌 수 있는데, 첫번째로 4차원(가로 x 세로 x 필터 x RGB)의 이미지 데이터를 처리하는데 최적화된 CNN(합성곱신경망) 알고리즘이 있고,
+두번째로 언어, 음성, 동영상 같은 순차형 데이터(번역, 대화, 의미/의도 파악 등)를 다루는데 최적의 성능을 발휘하는 RNN(순환신경망) 알고리즘이 있다.
+- 부록 B에서는 신경망의 레이어 사이의 모든 뉴런을 연결한 단순 DNN(심층신경망) 알고리즘을 이용해 주행 차량의 위험 징후를 판별하는 신경망 모델을 학습시키고 테스트 해본다.
+
+# 신경망 딥러닝의 기본 원리
+- 신경망 구성요소는 크게 입력층, 은닉층, 출력층으로 이뤄지며, 각각의 층은 뉴런(활성화 함수)으로 구성된다.
+- 은닉층의 레이어 수와 뉴런의 구성 방식에 따라 DNN, RNN, CNN 등으로 신경망의 종류가 나뉜다.
+- 학습시키기 위한 데이터가 정규화 과정을 거쳐 입력층에 할당되고, 중간의 가중치(W) 값에 의해 입력값이 변경되며, 각 은닉층 뉴런에서 입력값을 합쳐 활성화 함수에 전달된다.
+- 이때 활성화 함수는 전달받은 값을 계산해 임계치 이상의 값이 나오면 뉴런을 활성화해서 다음에 연결된 뉴런으로 결과값을 전달한다.
+- 활성화하는 함수로는 보통 시그모이드 또는 ReLu 를 쓴다.
+- 은닉층에서 뉴런들의 계산 결과는 마지막 출력층까지 전달되어 출력값이 나오는데, 이때 출력된 결과값과 실제 결과값의 오차율을 계산하는 오차함수(Cost Function)가 각 출력 뉴런마다 실행된다.
+- 이후 오차값을 가지고 신경망의 역순으로 뉴런들을 거슬러 올라가며 가중치 값을 오차값으로 업데이트 한다.
+- 이렇게 신경망의 가중치 값을 업데이트하는 과정을 역전파(Backpropagation)라고 하며, 가중치를 업데이트 하는 기법을 경사하강법이라 한다.
+- 이러한 과정을 반복(Epoch)하다 더는 오차율이 작아지지 않으면 신경망의 가중치 업데이트를 위한 학습을 멈추고, 이때의 최종 가중치 값을 조합해 신경망 모델이 완성된다.
+
+1. 설치 및 환경 구성
+	파이썬 3.5 설치
+	아나콘다(Anaconda) 설치: https://www.continuum.io/downloads   # 접속 안됨
+	텐서플로 설치(파이썬 pip 명령으로 설치)
+
+	# 사전 환경 세팅
+	[아나콘다 프롬프트]
+	# 콘다 자체 업데이트
+	conda update -n base conda
+
+	# 설치된 파이썬 패키지를 모두 최신 버전으로 업데이트
+	conda update --all
+
+	# pip 업그레이드
+	> python -m pip install --upgrade pip
+
+	# 텐서플로우 설치
+	pip install tensorflow
+
+#	# Conda 환경 만들기
+#	> conda create -n tensorflow python=3.5
+#	Proceed ([y]/n)? y
+#
+#	# TensorFlow 적용
+#	activate tensorflow
+#	# 프롬프트가 (base)에서 (tensorflow) 으로 변경 확인
+
+
+2. 텐서플로 활용 방안
+	# 텐서플로를 이용해 신경망 분석을 하기 위해 여기서는 "스마트카 내/외부 주행" 데이터셋을 새롭게 활용한다.
+	# 이 데이터셋에는 주행 중인 차량의 외부 환경(날씨, 온도, 습도, 사고다발지역) 정보와 차량의 내부 환경 정보(운전자 상태, 실내 이산화탄소의 양, 운행 속도, 운전대 각도)로 구성돼 있다.
+
+3. 텐서플로 파일럿 실행 1단계 - 텐서플로 개발 환경 실행
+	# 텐서플로 개발을 위해 파이썬 개발 환경을 실행한다. 파일럿 프로젝트에서는 파이썬의 주피터(Jupyter) 노트북을 이용한다.
+
+	# Anaconda3에서 Anaconda Prompt를 실행한다.
+	시작 -> 모든 프로그램 -> Anaconda3(64-bit) -> Anaconda Prompt 클릭
+
+	# 파이썬 3.5 환경을 활성화 한다. 저자는 파이썬 3.5를 설치할때 파이썬 3.5 환경의 이름을 "py35" 로 지정했다
+
+	# Anaconda Prompt에서 파이썬 3.5 환경을 활성화 한다. 파이썬 환경의 이름을 "py35"로 지정했으면 아래와 같이 입력한다.
+	> activate py35
+
+	# 주피터 노트북 실행
+	> jupyter notebook
+
+	# 웹 UI상의 주피터 파일 목록창이 자동으로 활성화
+	http://localhost:8888
+
+	# 텐서플로 라이브러리를 임포트하는 코드를 입력하고 "Shift + Enter" or 상단의 "Run Cell" 버튼을 눌러 실행한다.
+	import tensorflow as tf
+	# 오류내용이 없으면 정상 설치 완료
+
+4. 텐서플로 파일럿 실행 2단계 - 텐서플로를 이용한 딥러닝 학습 및 평가
+	# 텐서플로의 DNN 라이브러리를 이용해 주행중인 스마트카의 사고 위험 징후를 예측하는 딥러닝을 진행한다.
+	# 학습에 필요한 csv 데이터셋을 준비하고, 앞서 준비한 주피터 노트북 환경에서 간단한 딥러닝 예제를 실행한다.
+
+	# 학습할 데이터셋을 C://training_data 디렉터리에 넣고, 테스트 검증용 데이터셋은 C://test_data 디렉터리에 복사
+	/부록.B/CarDrivingIncidentInfo.csv -> C:\training_data
+	/부록.B/CarDrivingIncidentInfo_Test.csv -> C:\test_data
+
+	# 주피터 노트북에 다음 텐서플로 코드를 모두 입력하고 실행
+	=========[내부코드]============
+import tensorflow as tf
+import numpy as np
+
+# 데이터셋
+TRAINING_DATA = "C://training_data/CarDrivingIncidentInfo.csv"
+
+# 데이터셋을 불러옵니다.
+training_set = tf.contrib.learn.datasets.base.load_csv_with_header(
+    filename=TRAINING_DATA,
+    target_dtype=np.int,
+    features_dtype=np.int)
+
+# 모든 특성이 숫자값을 가지고 있다고 지정합니다
+feature_columns = [tf.contrib.layers.real_valued_column("", dimension=10)]
+
+# 10, 20, 10개의 유닛을 가진 3층 DNN를 만듭니다
+classifier = tf.contrib.learn.DNNClassifier(feature_columns=feature_columns,
+                                            hidden_units=[10, 20, 10],
+                                            n_classes=3,
+                                            model_dir="C://Users/Administrator/models")
+
+# 모델을 학습시킵니다.
+classifier.fit(x=training_set.data,
+               y=training_set.target,
+               steps=200)
+==========================================
+	실행
+	# 10개의 스마트카 입력 유닛과 3개의 은닉측이 각각 10, 20, 10 개의 유닛들로 구성되며 출력층은 3개 유닛으로 만들어 진다.
+
+	# 테스트 데이터셋을 이용해 앞서만든 신경망 모델을 평가한다.
+	# 텐서플로 코드를 입력하고 실행
+	==========[내부코드]=================
+# 데이터셋
+TEST_DATA = "C://test_data/CarDrivingIncidentInfo_Test.csv"
+
+# 데이터셋을 불러옵니다.
+test_set = tf.contrib.learn.datasets.base.load_csv_with_header(
+    filename=TEST_DATA,
+    target_dtype=np.int,
+    features_dtype=np.int)
+
+# 정확도를 평가합니다.
+accuracy_score = classifier.evaluate(x=test_set.data,
+                                     y=test_set.target)["accuracy"]
+
+# 평가 결과를 출력합니다.
+print('정확도: {0:f}'.format(accuracy_score))
+=========================================
+	실행
+
+	# 임의의 데이터셋을 입력해 스마트카 위험 징후를 정확히 예측 하는지 확인
+	==========[내부코드]============
+# 새로운 두 개의 주행정보를 분류합니다.
+new_samples = np.array(
+    [[2, 0, 0, 1, 2, 0, 2, 0, 0, 1], [1, 1, 2, 2, 2, 1, 2, 1, 2, 2]], dtype=int)
+y = list(classifier.predict(new_samples, as_iterable=True))
+print ('예측: {}'.format(str(y)))
+========================================
+	실행
+
+
+3. 텐서플로 파일럿 실행 3단계 - 텐서보드를 이용한 학습 결과 시각화
+	# 텐서보드라는 시각화 툴을 이용해 텐서플로 프로그램에서 의도적으로 남긴 요약 정보 및 최종 학습 결과 모델을 시각적으로 분석할 수 있다.
+	# 앞서 실행한 학습 결과 모델("C://Users/[사용자명]/models")을 텐서보드의 GRAPHS 메뉴를 통해 확인해 본다.
+	아나콘다 프롬프트 실행
+
+	# 파이썬 환경 활성화
+	> activate py35     # py35는 사용자가 설정한 파이썬 환경 이름
+
+	# 텐서보드 실행, "./models" 디렉토리는 앞선 DNN 학습 결과의 모델이 저장된 위치로 텐서플로 프로그램에서 명시적으로 지정 했었다.
+	> tensorboard --logdir=./models
+
+	# 텐서보드 웹 URL에 접속해 상단의 GRAPHS 메뉴를 선택
+	localhost:6006
+
+
+
+

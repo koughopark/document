@@ -1,0 +1,45 @@
+1.하이브 QL을 임팔라에서 실행하기
+	# 6장의 데이터 탐색에서 주제 영역 3에서 사용했던 하이브 QL을 임팔라로 재실행 한다.
+	# 이상 운전 패턴 스마트카 정보 조회
+	select * from Managed_SmartCar_Symptom_Info where biz_date = '20180905'
+
+	휴 -> 상단 메뉴 [쿼리] 콤보박스 -> 편집기 -> Impala 클릭
+
+	# 데이터 베이스 표시 안되면 새로고침 클릭, 그래도 안나오면 임팔라 재시작 이후 새로고침
+
+	# 6장의 주제영역 4, 5에 대한 스마트카 분석 쿼리를 임팔라를 이용해 추가 실행
+	# 긴급 점검이 필요한 스마트카 정보 조회
+	select * from Managed_SmartCar_Emergency_Check_Info where biz_date = '20180905'
+
+	# 스마트카 차량용품 구매 이력 정보 조회
+	select * from Managed_SmartCar_Item_BuyList_Info where biz_month = '201809'
+
+
+2. 임팔라를 이용한 운행 지역 분석
+	# 임팔라를 통해 스마트카 운행 지역별 평균 속도가 가장 높았던 스마트카 차량을 출력
+	# Impala Editor 에서 /CH07/ImpalaSQL/2nd 경로의 "그림-7.35" 쿼리 입력
+========[내부코드]=============
+select
+   T2.area_number, T2.car_number, T2.speed_avg
+from (
+       select
+              T1.area_number,
+              T1.car_number,
+              T1.speed_avg,
+              rank() over(partition by T1.area_number order by T1.speed_avg desc) as ranking
+       from (
+              select area_number, car_number, avg(cast(speed as int)) as speed_avg
+              from  managed_smartcar_drive_info
+              group by area_number, car_number
+            ) T1
+) T2
+where ranking = 1
+=================================
+	실행
+
+	결과 나오면 차트 보기로 해서 막대 그래프로 전환해서 한눈에 보이도록 시각화 한다.
+
+
+
+
+

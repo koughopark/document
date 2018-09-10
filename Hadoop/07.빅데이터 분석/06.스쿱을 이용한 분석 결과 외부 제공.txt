@@ -1,0 +1,61 @@
+빅데이터 시스템에서 탐색 및 분석한 결과는 외부 업무시스템에 제공되어 중요한 의사결정 포인트로 활용될 수 있어야 한다.
+그러기 위해서는 빅데이터의 HDFS에 저장된 데이터를 외부 시스템의 저장소(RDBMS)로 제공할 수 있어야 하는데, 이때 스쿱을 이용한다.
+반대로 외부 시스템의 저장소(RDBMS)에 있는 데이터를 HDFS로 가져오기를 할 때도 스쿱을 이용할 수 있다.
+
+
+1. 스쿱의 내보내기 기능 - 이상 운전 차량 정보
+	6장의 데이터 탐색에서 3번째 주제 영역 탐색 결과로 "스마트카 이상 운전 차량" 결과를 도출했고,
+	해당 데이터를 하이브의 Managed 영역에 Managed_SmartCar_Symptom_Info 테이블에 저장했다.
+	스쿱을 이용해 "이상 운전 차량 정보" 데이터셋을 PostgreSQL 로 내보내겠다.
+	PostgreSQL서버는 클라우데라의 CM에 기본으로 설치된 데이터베이스를 활용할 것이고 server01에 위치하고 있다.
+
+	# 사용할 DBMS 정보
+	RDBMS 유형: PostgreSQL
+	설치IP: 192.168.56.101
+	설치포트: 7432
+	데이터베이스:postgresql
+	접속계정:cloudera-scm
+	접속 패스워드: "각자의 환경"
+	# 패스워드의 경우 독자들의 파일럿 환경마다 차이가 있다.
+	# server01에서 다음 명령으로 확인한다
+	[server01]
+	cat /var/lib/cloudera-scm-server-db/data/generated_password.txt
+
+	# PostgreSQL에 콘솔로 접속해서 기본적인 데이터베이스 작업을 진행한다.
+	# 다음 명령으로 PostgreSQL 데이터베이스에 접속한다.
+	[server01]
+	psql -U cloudera-scm -p 7432 -h localhost -d postgres
+	# postgres=# 프롬프트 확인
+
+	# HDFS에 "이상 운전 패턴" 데이터를 PostgreSQL의 테이블로 저장하기 위한 RDBMS 테이블을 생성한다.
+	# 테이블명은 smartcar_symptom_info로 하겠다. 다음의 테이블 생성 명령을 실행한다.
+	=========[내부코드]===============
+create table smartcar_symptom_info ( car_number varchar, speed_p_avg varchar, speed_p_symptom varchar, break_p_avg varchar, break_p_symptom varchar, steer_a_cnt varchar, steer_p_symptom varchar, biz_date varchar );
+=================================
+	# "CREATE TABLE" 메세지 확인
+
+	# SELECT 쿼리를 실행해서 정상적으로 생성됐는지 확인
+	select * from smartcar_symptom_info;
+
+	# server01에서 스쿱 명령을 실행하기 위해 새로운 SSH 창을 열고 server01에 접속한다.
+	# 스쿱 명령을 실행하기 위해서는 PostgreSQL JDBC 드라이버를 스쿱의 라이브러리 경로에 복사해 놓아야 한다.
+	[server01, 새로운창]
+	cp /opt/cloudera/parcels/CDH/jars/postgresql-9.0-801.jdbc4.jar /opt/cloudera/parcels/CDH/lib/sqoop/lib
+
+	# 스쿱 내보내기 명령을 실행한다. 패스워드는 독자의 파일럿 환경에서 생성된 값으로 입력
+	sqoop export --connect jdbc:postgresql://127.0.0.1:7432/postgres --username cloudera-scm --password uH4O2loHKe --table smartcar_symptom_info --export-dir /user/hive/warehouse/managed_smartcar_symptom_info
+	# 사용된 주요 옵션
+	-username: PostgreSQL 계정
+	-password: PostgreSQL 패스워드
+	-table: PostgreSQL 데이터베이스 테이블명
+	-export-dir: 내보내기 할 HDFS 데이터 경로
+
+	# 명령이 정상적으로 실행되면 하이브의 Managed_SmartCar_Symptom_Info 테이블의 데이터 전체가 PostgreSQL의 smartcar_symptom_info 테이블에 내보내기됐을 것이다.
+	# PostgreSQL 콘솔로 접속해 다음의 SELECT 쿼리를 실행해보면 결과를 확인할 수 있다.
+	[server01, 기존창]
+	postgres=# select * from smartcar_symptom_info;
+
+	# 스쿱을 통해 외부 RDBMS에 데이터를 제공하는 작업도 일/주/월/년별로 수행해야 하는 정기적인 배치 프로세스 작업이다.
+	# 이때는 휴의 워크플로의 작업 노드를 스쿱 작업으로 생성할 수 있는데, 여기에 앞서 사용했던 스쿱 내보내기 명령을 입력해 워크플로로 생성하면 정기적인 내보내기 워크플로 작업을 수행할 수 있다.
+
+

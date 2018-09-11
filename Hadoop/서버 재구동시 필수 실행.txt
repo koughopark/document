@@ -1,0 +1,8 @@
+# 실시간 적재환경 구성 실행, 서버 재구동 하고 다시 실행시켜줘야 한다.
+/etc/init.d/storm-nimbus start
+/etc/init.d/storm-supervisor start
+/etc/init.d/storm-ui start
+
+/etc/init.d/storm-nimbus status
+/etc/init.d/storm-supervisor status
+/etc/init.d/storm-ui status

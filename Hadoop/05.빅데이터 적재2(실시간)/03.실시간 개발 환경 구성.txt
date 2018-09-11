@@ -7,6 +7,7 @@
 	좌측 Package Explorer -> pom.xml 파일 열기
 	상단메뉴 Run -> Run As -> Maven install 클릭
 
+
 3. 업로드
 #	Package Explorer 의 target 디렉터리 안에 bigdata.smartcar.storm-1.0.jar 파일이 생성되있다.
 #	해당 파일을
@@ -17,6 +18,8 @@
 	storm kill DriverCarInfo
 	storm jar bigdata.smartcar.storm-1.0.jar com.wikibook.bigdata.smartcar.storm.SmartCarDriverTopology DriverCarInfo
 
+4. 스톰 Topology 정상배포됐는지 확인
+	http://server02.hadoop.com:8087
 ==============================
 이클립스가 실행되면 프로젝트내 pom.xml 파일을 참조하여 라이브러리를 다운받는다.
 

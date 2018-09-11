@@ -35,7 +35,8 @@
 		사용자: root
 		비밀번호: 비밀번호
 
-		/home/bigdata/ <- Sample.txt 파일 복사
+	bigdata 계정 경로: sftp://server02.hadoop.com/home/bigdata
+	/CH02/Sample.txt 파일 /bigdata 디렉토리에 업로드
 
 	# HDFS에 파일 저장
 	[server02]

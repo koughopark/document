@@ -1,9 +1,25 @@
-준비물: 자바설치, 리눅스 iso 파일, 버추얼 박스 설치
+환경구성:
+	1. 자바설치
+	2. 이클립스 설치
+	3. 버추얼 박스 설치
+	4. 가상머신에 CentOS 설치(CentOS ISO파일)
+	5. 기타 도구: xShell, 파일질라, PuTTY, 크롬, 예제 코드
+
+	# 예제 코드 받기
+	https://github.com/wikibook/bigdata/archive/master.zip
+
+	# CentOS ISO 받기
+	http://ftp.daumkakao.com/centos/6/isos/x86_64
+
+
 
 1. 자바 설치 및 패스 설정
 	- 변수이름: JAVA_HOME
 	- 변수 값: 자바 jdk 설치 경로
 	- 시스템 변수 path: (%JAVA_HOME%\bin)
+
+	# 자바 버전 확인
+	cmd -> java -version    # 가상환경 운영체제에서도 확인가능, 가상환경 운영체제와 설치된 이클립스 컴파일 버전을 같은것으로 맞춰준다.
 
 2. 버추얼 박스 가상파일 생성및 기본 환경설정
 	공용환경

@@ -1,23 +1,61 @@
+- CM(Cludera Manager)은 빅데이터 에코시스템을 쉽게 설치하고 관리해주는 쿨라우데라의 강력한 빅데이터 자동화 도구다.
+- 빅데이터 소프트웨어에 대한 프로비저닝, 매니지먼트, 모니터링을 수행할 수 있다.
+	프로비저닝: 하둡 에코시스템을 편리하게 설치, 삭제, 수정 관리
+	매니지먼트: 설치한 에코시스템의 설정 변경 및 최적화 지원
+	모니터링: 하드웨어의 리소스 및 설치 컴포넌트의 상태 모니터링/대시보드
+
+# CM5.9.x 의 설치 정보가 있는 레포 파일을 다운로드
 server01 root 접속
-wget https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin
+wget https://archive.cloudera.com/cm5/redhat/6/x86_64/cm/cloudera-manager.repo   # 6버전 받기
 
-chmod 700  cloudera-manager-installer.bin
+# 다운로드 받은 cloudera-manager.repo 파일을 vi를 통해 열기
+vi /root/cloudera-manager.repo
 
-./cloudera-manager-installer.bin    # 클라우데라 인스톨
-	Accept this license? -> yes
+# 파일 내용중 baseurl 정보 변경
+변경전: baseurl=http://archive.cloudera.com/cm5/redhat/6/x86_64/cm/5/
+변경후: baseurl=http://archive.cloudera.com/cm5/redhat/6/x86_64/cm/5.9.0
 
-# 설치중 확인
-(다른창) server1 다시 접속
- -> top 입력 # top은 현재 돌고있는 프로세스 확인.
+# 수정한 cloudera-manager.repo 파일을 yum의 레파티지토리 경로로 이동
+mv /root/cloudera-manager.repo /etc/yum.repos.d/
 
-# 설치후 확인
-/etc/init.d/cloudera-scm-server status
-chkconfig --list
+# CM 데몬과 서버를 설치.
+# 먼저 JDK 1.7 설치
+yum install oracle-j2sdk1.7
 
-//
-clo
-echo $PATH
-//
+# CM 설치
+yum install cloudera-manager-daemons cloudera-manager-server
+
+# CM의 내부에서 사용하는 DB 설치, PostgreSQL로 자동 설치
+yum install cloudera-manager-server-db-2
+# DB의 인스턴스 시작
+service cloudera-scm-server-db start
+
+# CM 정상 기동 확인
+service cloudera-scm-server status
+# "cloudera-scm-server is running..." 메시지 확인
+
+============= ppt 내용============================
+#wget https://archive.cloudera.com/cm5/installer/latest/cloudera-manager-installer.bin   # 최신버전 받기
+#
+## 권한 설정
+#chmod 700  cloudera-manager-installer.bin
+#
+#./cloudera-manager-installer.bin    # 클라우데라 인스톨
+#	Accept this license? -> yes
+#
+## 설치중 확인
+#(다른창) server1 다시 접속
+# -> top 입력 # top은 현재 돌고있는 프로세스 확인.
+#
+## 설치후 확인
+#/etc/init.d/cloudera-scm-server status
+#chkconfig --list
+#
+#//
+#clo
+#echo $PATH
+#//
+===================================================
 
 ==============[웹페이지]================
 
@@ -42,10 +80,30 @@ JDK 설치 옵션
 - 사용자 지정 서비스 선택
 	HDFS, YARN, ZooKeeper 체크
 - 위치지정
-	HDFS: server01
-	Cloudera Management Service: server03
-	YARN: server01
-	ZooKeeper: server02
+	HDFS =>
+		NameNode: server01,
+		SecondaryNameNode: server01,
+		Balancer: server01,
+		HttpFS: skip,
+		NFS Gateway: skip,
+		DataNode: server02, server03
+
+	Cloudera Management Service =>
+		Service Monitor: server03,
+		Activity Monitor: skip,
+		Host Monitor: server03,
+		Reports Manager: server03,
+		Event Server: server03,
+		Alert Publisher: server03
+
+	YARN =>
+		ResourceManager: server01
+		JobHistory Server: server01
+		NodeManager: server01
+
+	ZooKeeper =>
+		Server: server02
+
 - 데이터베이스 설정
 	내장된 데이터베이스 사용
 	테스트 연결

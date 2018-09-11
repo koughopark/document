@@ -6,6 +6,8 @@ java 설치 시스템
 java 설치 경로
 /usr/java
 
+# 파일럿 프로젝트를 위한 작업 폴더 생성
+[server02]
 cd /home
 mkdir /home/pilot-pjt
 mkdir /home/pilot-pjt/working
@@ -13,22 +15,84 @@ mkdir /home/pilot-pjt/working/car-batch-log
 mkdir /home/pilot-pjt/working/driver-realtime-log
 chmod 777 -R /home/pilot-pjt
 
-cd /usr/bin
-rm -f java  # java 파일을 삭제한다.
-rm -f javac
-rm -f javadoc
-rm -f javaws
-ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java java
-ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javac javac
-ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javadoc javadoc
-ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javaws javaws
-ln -s /usr/java/jdk1.7.0_67-cloudera/bin/jps jps
-ls -l java*
+# 자바 컴파일과 실행 환경을 1.7로 변경
+# 아래 명령을 통해 /usr/bin 의 심볼릭 링크를 재설정
+rm /usr/bin/java
+rm /usr/bin/javac
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javac /usr/bin/javac
+ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java /usr/bin/java
 
+=====ppt 내용========
+#cd /usr/bin
+#rm -f java  # java 파일을 삭제한다.
+#rm -f javac
+#rm -f javadoc
+#rm -f javaws
+#ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java java
+#ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javac javac
+#ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javadoc javadoc
+#ln -s /usr/java/jdk1.7.0_67-cloudera/bin/javaws javaws
+#ln -s /usr/java/jdk1.7.0_67-cloudera/bin/jps jps
+#ls -l java*
+=======================
+
+# 자바 버전 확인
 java -version
 
-yum install perl-devel # 이미 인스톨 되어 있음
+# 자바로 만들어진 스마트카 로그 시뮬레이터 프로그램을 server02에 업로드
+파일럿 작업경로: sftp://server02.hadoop.com/home/pilot-pjt/working
+소스경로: /CH02/bigdata.smartcar.loggen-1.0.jar
 
+# 업로드한 스마트카 로그 시뮬레이터를 실행
+# 로그 시뮬레이터에는 두개의 메인 자바 프로그램이 있다
+# 첫째는 스마트카 운전자의 운행 정보를 실시간으로 발생시키는 DriverLogMain.java
+# 둘때는 스마트카의 상태 정보를 주기적으로 발생시키는 CarLoginMain.java
+# 먼저 스마트카 운행 정보를 실시간으로 만드는 DriverLogMain.java를 실행
+[server02]
+cd /home/pilot-pjt/working
+java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160101 10
+
+# 시뮬레이터 정상 작동 확인
+[server02, 새창]
+cd /home/pilot-pjt/working/driver-realtime-log
+tail -f SmartCarDriverInfo.log
+
+# 로그 시뮬레이터 종료
+[server02, 기존 창]
+ps -ef | grep smartcar.log  # pid 기억
+kill -9 [pid]
+
+# 두번째 시뮬레이터 CarLogMain.java 실행
+cd /home/pilot-pjt/working
+java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 10
+
+# 시뮬레이터 정상 작동 확인
+[server02, 새창]
+cd /home/pilot-pjt/working/SmartCar
+tail -f SmartCarStatusInfo_20160101.txt
+
+# 로그 시뮬레이터 종료
+[server02, 기존 창]
+ps -ef | grep smartcar.log  # pid 기억
+kill -9 [pid]
+
+# 스마트카 로그 시뮬레이터를 실행할때 옵션 적용
+# 첫번째 매개변수는 실행날짜
+# 두번째 매개변수는 스마트카 대수
+# 다음 명령어로 실행하면 SmartCarStatusInfo_20160101.txt 가 생성된다.
+java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 10
+
+
+
+
+
+
+
+
+
+
+=====================ppt내용================================================
+#yum install perl-devel # 이미 인스톨 되어 있음
 
 1. git client설치
 wget https://www.kernel.org/pub/software/scm/git/git-2.6.4.tar.gz      # 파일 다운로드

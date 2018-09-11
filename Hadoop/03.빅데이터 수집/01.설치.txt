@@ -16,7 +16,7 @@
 4. 카프카설치
 	CM홈에서 Cluster1 콤보박스 클릭 -> 서비스 추가
 	Kafka 선택 -> 계속
-	Kafka Broker 호스트 선택 클릭 -> server02 선택 -> 확인 -> 계속
+	Kafka Broker 호스트 선택 클릭 -> server02 선택 -> 확인 -> 계속   # MirrorMaker, Gateway 는 skip
 	[오류나면]
 		새 브라우저 열기 -> CM 접속
 		CM 홈 -> kafka -> 구성 -> 검색: java heap

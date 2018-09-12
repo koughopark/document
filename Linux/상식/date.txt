@@ -1,0 +1,8 @@
+date -d 'yesterday'     # 어제 시간
+date --date='yesterday' # 어제시간
+
+date -d '2 month'       # 두달후
+date --date='2 month'   # 두달후
+
+명령어 -단축옵션 '값'
+명령어 --옵션='값'

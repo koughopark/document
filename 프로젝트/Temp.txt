@@ -1,0 +1,12 @@
+$ mkdir data    # data 디렉토리 생성
+$ cd data       # data 디렉토리로 이동
+$ ln -s $celebA_path celebA # 링크파일생성 심볼릭링크로선택 [celebA_path 변수에 저장되어 있는 값을] [celebA이라는 이름으로 링크] | 사용법: ln [옵션] 원본파일 대상파일(대상디렉토리)
+그런 다음 image_list 파일을 만듭니다.
+
+# 파이썬실행 tools/create_ima_lists.py파일 --dataset옵션='data/celebA'값 --outfile옵션='data/train.txt'값
+$ python tools/create_img_lists.py --dataset=data/celebA --outfile=data/train.txt
+Gpu에서 모델 교육
+
+$ python tools/train.py
+(or $ python tools/train.py --device_id=0)
+cpu에서 모델 교육 : $ python tools / train.py --use_gpu = False

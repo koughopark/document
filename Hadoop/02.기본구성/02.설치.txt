@@ -25,19 +25,28 @@
 	공용환경
 	- 일반: 기본 머신 폴더:
 	- 네트워크 -> 새 네트워크 추가
+	- 전역도구 -> 호스트 네트워크 관리자 -> 어댑터 탭 -> 수동으로 어댑터 설정:
+		IPv4 주소: 192.168.56.1
+		IPv4 서브넷 마스크: 255.255.255.0
+	- 전역도구 -> 호스트 네트워크 관리자 -> DHCP 서버 탭 -> 서버사용함 체크
+		서버주소: 192.168.56.100
+		서버 마스크: 255.255.255.0
+		최저 주소 한계: 192.168.56.101
+		최고 주소 한계: 192.168.56.254
 	- 입력 -> 가상머신 -> 호스트 키 조합 Alt + Ctrl
+
 	- 새로만들기
-		이름: lx01
+		이름: server01
 		종류: Linux
 		버전: Red Hat(64-bit)
-		- 메모리 크기: 4096
+		- 메모리 크기: 2048
 		- 지금 새 가상 하드 디스크 만들기
 		- VDI 디스크 이미지 만들기
 		- 동적 할당
 		- 파일 위치 및 크기: 40GB
 		만들기
 	개별 환경
-		- 네트워크: 브릿지 어댑터
+		- 네트워크: 브릿지 어댑터     # ppt 내용
 		- 저장소 광학드라이브 -> 리눅스 iso 파일 삽입 -> 시작
 
 3. 가상환경에서 리눅스 설치 진행
@@ -55,9 +64,22 @@
 		.만들기 -> 표준파티션 -> 생성 -> 파일시스템 유형: swap, 용량: 2048
 		.만들기 -> 표준파티션 -> 생성 -> 마운트 지점: /, 추가 용량 옵션: 가능한 최대 용량으로 채움
 		- 다음 -> 포맷 -> 디스크에 변경사항 기록
-	- 다음 -> 설치진행 -> 재부팅
+	- 부트로더 기본값 유지, 다음 -> 설치진행 -> 재부팅 -> 로그인
+
+	# 라이브 버전 설치했을 경우
+	Forward -> 라이선스 동의 -> 사용자 생성정보 입력 -> 날짜및 시간: Synchronize date and time over the network 체크
+	-> kdump 체크 해제 -> 조금전에 생성했던 정보로 로그인
+	# CentOS 환경 구성
+	CentOS 데스크톱 상단 -> 프로그램 -> 시스템 도구 -> 터미널 선택
+	su root
+	Password: manager
+	vi /etc/inittab
+	하단의 id: 5->3 으로 변경
+	reboot
+	로그인
 
 4. 서버 ip 확인
+# ip 주소 모를경우, 처음 설치
 ifconfig -a     # ip 확인
 cd /etc         # 경로
 cd sysconfig
@@ -67,18 +89,35 @@ ls      # 파일
 vi ifcfg-eth0   # 파일 열기
 insert 누르고 OnBOOT=no -> yes 변경후 ESC 누르고 :wq 하고 나온다. # 저장
 
+# 입력할 ip가 있을경우, 두번 이상 설치
+vi /etc/sysconfig/network-scripts/ifcfg-eth0
+insert 누르고 OnBOOT=no -> yes
+HWADDR=네트워크 어댑터2 MAC 주소 부분 입력
+IPADDR=192.168.1.(값)
+NETMASK=255.255.255.0
+GATEWAY=192.168.1.1
+NETWORK=192.168.1.0
+
 # CentOS 리눅스가 자동으로 설정한 네트워크 룰을 삭제
 vi /etc/udev/rules.d/70-persistent-net.rules
 # PCI device 0x8086:0x100e (e1000)
 # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:c4:e9:b7", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
 전체 주석 처리
 
+# nameserver 정보 등록
+vi /etc/resolv.conf
+nameserver 168.126.63.1 <= 입력
+
 service network restart     # 네트워크 재시작
 
-/etc/init.d/network restart # 네트워크 재시작
+ifconfig -a
 
-sync # 메모리에 있는거 남기지 말고 실행
-reboot  # 시스템 재시작
+reboot
+
+#/etc/init.d/network restart # 네트워크 재시작  # ppt 내용
+
+#sync # 메모리에 있는거 남기지 말고 실행  # ppt
+#reboot  # 시스템 재시작              # ppt
 
 5. 리눅스 패키지 설치
 # SSH 접속을 위한 패키지 설치
@@ -94,6 +133,18 @@ ssh root@IP주소  # 시큐어셀 원격 접속
 pass: manager
 /
 
+# server01 호스트 정보 수정, 기존 내용 지우고 아래내용 입력, 소문자 입력
+vi /etc/hosts
+127.0.0.1 localhost server01
+192.168.1.163 server01.hadoop.com server01
+192.168.1.188 server02.hadoop.com server02
+192.168.1.207 server03.hadoop.com server03
+
+vi /etc/sysconfig/network
+HOSTNAME=server01.hadoop.com <= 입력
+
+service network restart
+
 # 패키지 설치
 yum repolist
 yum update
@@ -108,13 +159,21 @@ yum -y install bind-utils
 yum -y install psmisc
 
 
-6. 접속 계정 생성
-useradd -g wheel datamaster     # 유저 만들기
-passwd datamaster           # 패스워드 설정
-/
-ssh datamaster@IP주소
-pass: manager
-/
+아래 내용 건너뛰고 설치해본다.
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+
+
+
+#6. 접속 계정 생성    #ppt
+#useradd -g wheel datamaster     # 유저 만들기
+#passwd datamaster           # 패스워드 설정
+#/
+#ssh datamaster@IP주소
+#pass: manager
+#/
 
 7. 서버 시간 동기화
 vi time_sync.sh
@@ -134,23 +193,34 @@ mv time_sync.sh /etc/cron.hourly    # etc/corn.hourly 라는 이름으로 이동
 
 (w 현재 접속 계정 확인)
 
+==================================================================
+==================================================================
+==================================================================
+==================================================================
+여기까지 건너뜁
+
+
+
+
+
+
 8. 파일럿 프로젝트를 위한 OS 기본 값 설정
 # vi /etc/sysconfig/selinux
 SELINUX=enforcing 을 SELINUX=disabled
 
 9. 방화벽(iptables) 끄기
-ps -ef | grep iptables
-(iptables 는 방화벽 프로그램)
+#ps -ef | grep iptables
+#(iptables 는 방화벽 프로그램)
 
-======= 참고 ===============
-kill -9 # 9번 시그널(kill)을 보내라.
-
-/etc/init.d/iptables start  # 프로세스 시작
-/etc/init.d/iptables stop   # 프로세스 정지
-
-chkconfig  # 리눅스가 시작될때 자동으로 실행되는 데몬 프로그램 출력
-chkconfig iptables off
-=============================
+#======= 참고 ===============
+#kill -9 # 9번 시그널(kill)을 보내라.
+#
+#/etc/init.d/iptables start  # 프로세스 시작
+#/etc/init.d/iptables stop   # 프로세스 정지
+#
+#chkconfig  # 리눅스가 시작될때 자동으로 실행되는 데몬 프로그램 출력
+#chkconfig iptables off
+#=============================
 
 /etc/init.d/iptables stop
 or
@@ -161,10 +231,10 @@ chkconfig ip6tables off
 
 sysctl -w vm.swappiness=100
 vi /etc/sysctl.conf
-#vm.swappiness = 100  를 아래 추가하고 저장
+vm.swappiness = 100  를 아래 추가하고 저장
 
 vi /etc/rc.local
-#/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled  를 추가하고 저장한다.
+/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled  를 추가하고 저장한다.
 
 ##/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/defrag   <- ppt에 있고 책에 없는 내용
 ##/bin/echo never > /sys/kernel/mm/redhat_transparent_hugepage/enabled
@@ -186,11 +256,11 @@ root hard nproc 32768
 reboot
 서버 종료
 
-virtualbox 프로젝트에서 우클릭 -> 네트워크 카드 MAC 주소 초기화 체크->
+virtualbox 프로젝트에서 우클릭 -> 복제 -> 네트워크 카드 MAC 주소 초기화 체크->
 완전한 복제 -> 복제
 
 ------------------------------------------
-
+# 2,3 번 완료되기 전까지 1 server는 실행금지
 프로젝트 2번 시작
 root 접속
 
@@ -201,9 +271,15 @@ cd /etc
 cd sysconfig
 cd network-scripts
 
+# 첫번째 설치일 경우, 입력할 IP주소가 없을 경우
 ls -a
 vi ifcfg-eth0
-DEVICE, HWADDR 부분 동기화
+DEVICE, HWADDR 버추얼박스 환경과 동기화
+
+# 두번째 설치일 경우, 입력할 IP주소가 있을경우
+ls -a
+vi ifcfg-eth0
+DEVICE, HWADDR, 버추얼박스 환경과 동기화 및 IPADDR 입력
 
 # CentOS 리눅스가 자동으로 설정한 server01의 네트워크 룰을 삭제
 vi /etc/udev/rules.d/70-persistent-net.rules
@@ -211,19 +287,39 @@ vi /etc/udev/rules.d/70-persistent-net.rules
 # SUBSYSTEM=="net", ACTION=="add", DRIVERS=="?*", ATTR{address}=="08:00:27:c4:e9:b7", ATTR{type}=="1", KERNEL=="eth*", NAME="eth0"
 전체 주석 처리
 
-ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
-mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
-
-호스트 이름을 바꿔줘야 한다. 현재 server01 -> server02
-vi /etc/sysconfig/network
-
-service network restart
-/etc/init.d/network restart
-
 reboot
 
+vi /etc/hosts
+첫째줄 server01 -> server02 수정
+
+vi /etc/sysconfig/network
+HOSTNAME=server01.hadoop.com => server02.hadoop.com 로 수정
+
+service network restart
+reboot
+
+# 설정 정상 반영 확인
 ifconfig -a
-ip 확인
+hostname
+
+
+
+======= 아래내용 건너뛰고 설치해본다
+#ifconfig -a 로 확인했을때 eth(번호) 부분과 동일하게 맞춰준다.
+#mv ifcfg-eth0 ifcfg-eth1    # mv 명령은 앞의 파일을 뒤의 파일로 바꾼다.
+#
+#호스트 이름을 바꿔줘야 한다. 현재 server01 -> server02
+#vi /etc/sysconfig/network
+#
+#service network restart
+#/etc/init.d/network restart
+#
+#reboot
+#
+#ifconfig -a
+#ip 확인
+
+===============여기까지
 
 =====================
 3번 프로젝트 복사 -> 위와같이 세팅

@@ -3,8 +3,8 @@
 java 설치 시스템
 [server02]
 
-java 설치 경로
-/usr/java
+#java 설치 경로
+#/usr/java
 
 # 파일럿 프로젝트를 위한 작업 폴더 생성
 [server02]
@@ -13,7 +13,7 @@ mkdir /home/pilot-pjt
 mkdir /home/pilot-pjt/working
 mkdir /home/pilot-pjt/working/car-batch-log
 mkdir /home/pilot-pjt/working/driver-realtime-log
-chmod 777 -R /home/pilot-pjt
+chmod 777 -R /home/pilot-pjt    # 1실행허용, 2쓰기허용, 4읽기허용 | 첫째자리: 소유자, 둘째자리: 그룹, 셋째자리: 기타사용자 | -R 서브 디렉토리(하위폴더)까지 적용, -f 자기 소유가 아닌 파일에 까지 변경 시도.
 
 # 자바 컴파일과 실행 환경을 1.7로 변경
 # 아래 명령을 통해 /usr/bin 의 심볼릭 링크를 재설정
@@ -38,6 +38,7 @@ ln -s /usr/java/jdk1.7.0_67-cloudera/bin/java /usr/bin/java
 
 # 자바 버전 확인
 java -version
+# "1.7.0_67" 확인
 
 # 자바로 만들어진 스마트카 로그 시뮬레이터 프로그램을 server02에 업로드
 파일럿 작업경로: sftp://server02.hadoop.com/home/pilot-pjt/working
@@ -46,7 +47,7 @@ java -version
 # 업로드한 스마트카 로그 시뮬레이터를 실행
 # 로그 시뮬레이터에는 두개의 메인 자바 프로그램이 있다
 # 첫째는 스마트카 운전자의 운행 정보를 실시간으로 발생시키는 DriverLogMain.java
-# 둘때는 스마트카의 상태 정보를 주기적으로 발생시키는 CarLoginMain.java
+# 둘째는 스마트카의 상태 정보를 주기적으로 발생시키는 CarLoginMain.java
 # 먼저 스마트카 운행 정보를 실시간으로 만드는 DriverLogMain.java를 실행
 [server02]
 cd /home/pilot-pjt/working

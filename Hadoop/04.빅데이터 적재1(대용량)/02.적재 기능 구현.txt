@@ -125,3 +125,5 @@ SmartCar_Agent.sources.DriverCarInfo_TailSource.channels = DriverCarInfo_Channel
 SmartCar_Agent.sinks.DriverCarInfo_KafkaSink.channel = DriverCarInfo_Channel
 
 2. 변경 내용 저장
+
+3. CM 홈 -> 플럼 재시작

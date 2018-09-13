@@ -13,6 +13,7 @@
 	cd /home/pilot-pjt/working
 	# 스마트카 로그 시뮬레이터를 자바 명령으로 백그라운드 방식으로 실행. 2016년 1월 1일의 100대의 스마트카에 상태 정보 로그를 생성
 	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20160101 100 &
+	# 실행하면 /home/pilot-pjt/working/SmartCar 디렉토리에 파일 생성
 
 	# 정상 작동 됐는지 확인. SmartCarStatusInfo_20160101.txt 파일 생성 확인
 	cd /home/pilot-pjt/working/SmartCar
@@ -22,6 +23,7 @@
 	# 플럼의 SmartCar 에이전트가 정상적으로 작동하고 있다면 SpoolDir이 참조하고 있는 /home/pilot-pjt/working/car-batch-log 경로에 파일이 생성됨과 동시에 플럼의 파일 수집 이벤트가 작동
 	# /home/pilot-pjt/working/SmartCar 경로에 만들어진 SmartCarStatusInfo_20160101.txt 파일을 플럼의 SmartCarInfo의 SpoolDir 경로인 /home/pilot-pjt/working/car-batch-log로 옮겨서 플럼의 File 이벤트가 작동되게 해보자.
 	mv /home/pilot-pjt/working/SmartCar/SmartCarStatusInfo_20160101.txt /home/pilot-pjt/working/car-batch-log/
+	# SpoolDir 디렉토리에 파일이 생성되면 플롬에서 파일을 수집하여 하둡웹페이지에 업로드 한다.
 
 	# 플럼의 실행 로그를 통해 SmartCarInfo_Agent가 정상적으로 작동하는지 확인
 	cd /var/log/flume-ng/
@@ -37,10 +39,11 @@
 
 	# HDFS에 적재된 스마트카 상태 정보 파일 내용 확인
 	# hdfs dfs -cat "출력된 디렉터리/파일명.log"
-	hdfs dfs -cat /pilot-pjt/collect/car-batch-log/wrk_date=20180905/car-batch-log.1536155332475.log
+	hdfs dfs -cat /pilot-pjt/collect/car-batch-log/wrk_date=20180913/car-batch-log.1536822153292.log
 
 	# 단순 데이터 확인에는 tail 명령을 권장
-	hdfs dfs -tail /pilot-pjt/collect/car-batch-log/wrk_date=20180905/car-batch-log.1536155332475.log
+	hdfs dfs -tail /pilot-pjt/collect/car-batch-log/wrk_date=20180913/car-batch-log.1536822153292.log
+	# 출력 정보: 앞의 날짜는 데이터 발생 일자, 뒤에붙은 날짜는 데이터 수집일자, 플럼의 인터셉터가 붙여넣은 추가 정보다.
 
 	# 백그라운드로 실행했던 스마트카 로그 시뮬레이터 종료
 	ps -ef | grep smartcar.log  # pid 기억

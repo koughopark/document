@@ -2,7 +2,7 @@
 	# 하둡 웹 관리 화면에 접속해서 설치된 하둡의 상태 정보를 확인.
 	http://server01.hadoop.com:50070
 	or
-	CM 홈 -> HEFS 선택 -> 상단 메뉴[NameNode 웹 UI] 클릭
+	CM 홈 -> HDFS 선택 -> 상단 메뉴[NameNode 웹 UI] 클릭
 
 	# 리소스 매니저
 	http://server01.hadoop.com:8088/cluster

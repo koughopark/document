@@ -97,7 +97,13 @@ SmartCar_Agent.sinks.DriverCarInfo_KafkaSink.channel = DriverCarInfo_Channel
 
 6. 카프카 Topic 생성
 	[server02]
+	# replication-factor 옵션은 카프카를 다중 Broker로 만들고 전송한 데이터를 replication-factor 개수만큼 복제, 파일럿 환경에서는 1개
+	# partitions 옵션은 해당 Topic에 데이터들이 partitions의 개수만큼 분리 저장. 다중 Broker에서 쓰기/읽기 성능 향상을 위해 사용하는 옵션, 파일럿 환경에서는 1개
+	# --topic 옵션으로 파일럿 환경에서 사용할 토픽명을 정의, 플럼의 예제 3.4 DriverCarInfo_KafkaSink에서 설정한 토픽이름과 같아야 한다. => SmartCar_Agent.sinks.DriverCarInfo_KafkaSink.topic = SmartCar-Topic
 	kafka-topics --create --zookeeper server02.hadoop.com:2181 --replication-factor 1 --partitions 1 --topic SmartCar-Topic
+	# Created topic "SmartCar-Topic". 메세지 확인
+	# 토픽의 메타 정보들이 Zookeeper의 Z노드라는 곳에 만들어지고 관리된다.
+
 	- 토픽 삭제
 	kafka-topics --delete --zookeeper server02.hadoop.com:2181 --topic SmartCar-Topic
 

@@ -26,6 +26,9 @@
 	> drop 'smartcar_test_table'
 	> exit
 
+	# 웹페이지에서 HBase 구동 확인
+	http://server01.hadoop.com:60010/
+
 3. 레디스 설치
 	[server02, root]
 	# 기본 환경 구성 설치

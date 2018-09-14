@@ -2,7 +2,7 @@
 	[server02]
 	# 플럼 -> 카프카 -> 스톰 -> HBase 순으로 데이터가 수집 및 적재된다
 	cd /home/pilot-pjt/working
-	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20180911 20 &
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20160103 20 &
 
 	# 운전자의 실시간 로그가 정상적으로 발생하는지 확인
 	[server02, 새창]
@@ -10,7 +10,7 @@
 	tail -f SmartCarDriverInfo.log
 
 2. HBase에 적재 데이터 확인
-	[server02]
+	[server01]
 	hbase shell
 	> count 'DriverCarInfo'
 
@@ -18,10 +18,11 @@
 	> scan 'DriverCarInfo', {LIMIT=>20}
 
 	# 특정 로우키 조건절 추가
-	> scan 'DriverCarInfo', {STARTROW=>'00000011908102-Z0018', LIMIT=>1}
+	> scan 'DriverCarInfo', {STARTROW=>'00000030106102-Z0019', LIMIT=>1}
 
-	# 조검 변경후 조회
-	> scan 'DriverCarInfo', {COLUMNS=>['cf1:car_number','cf1:area_number'],FILTER=>"RowFilter(=,'regexstring:11908102') AND SingleColumnValueFilter( 'cf1', 'area_number' , = , 'regexstring:D04' )"}
+	# 조건 변경후 조회
+	# regexstring: 값은 위의 검색결과에 맞춰서 입력
+	> scan 'DriverCarInfo', {COLUMNS=>['cf1:car_number','cf1:area_number'],FILTER=>"RowFilter(=,'regexstring:30106102') AND SingleColumnValueFilter( 'cf1', 'area_number' , = , 'regexstring:D02' )"}
 
 	# 웹관리자 에서 분산적재 확인
 	http://server01.hadoop.com:60010/
@@ -30,16 +31,17 @@
 3. 레디스에 적재된 데이터 확인
 	[server02]
 	redis-cli
-	> smembers 20180911
+	> smembers 20160103
 
 4. 레디스 클라이언트 애플리케이션 작동
 	# 레디스로부터 2016년 01월 03일에 발생되는 과속 차량 정보를 10초 간격으로 가져오는 프로그램
 	# ~/CH05/bigdata.smartcar.redis-1.0.jar 파일을 server02의 /home/pilot-pjt/working 디렉토리에 업로드
+	소스파일 경로: /CH05/bigdata.smartcar.redis-1.0.jar
 	파일럿 작업 경로: sftp://server02.hadoop.com/home/pilot-pjt/working
 
 	# PuTTY 콘솔로 server02에 접속해서 레디스 클라이언트 애플리케이션을 실행
 	cd /home/pilot-pjt/working
-	java -cp bigdata.smartcar.redis-1.0.jar com.wikibook.bigdata.smartcar.redis.OverSpeedCarInfo 20180911
+	java -cp bigdata.smartcar.redis-1.0.jar com.wikibook.bigdata.smartcar.redis.OverSpeedCarInfo 20160103
 	# 해당 애플리케이션을 계속 실행해 두면 스톰 및 에스퍼에서 발견한 과속 차량을 실시간으로 감지해서 레디스로부터 가져온다.
 
 	# 시뮬레이터 종료

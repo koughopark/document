@@ -103,7 +103,7 @@ ui.port: 8087
 	vi /root/.bash_profile
 	====[내부 추가]=======
 	PATH=$PATH:$HOME/bin
-	PATH=$PATH: /home/pilot-pjt/storm/bin   <- 추가
+	PATH=$PATH:/home/pilot-pjt/storm/bin   <- 추가
 	export PATH
 	============
 	source /root/.bash_profile
@@ -121,6 +121,7 @@ ui.port: 8087
 	# 스톰의 서비스 등록파일 업로드
 	파일질라 실행 ->
 	스크립트 경로:
+		소스파일 경로: /CH05/예제5.1/storm-*
 		sftp://server02.hadoop.com/etc/rc.d/init.d
 		storm-nimbus, storm-supervisor, storm-ui 파일 업로드
 

@@ -30,7 +30,7 @@
 
 	# HBase 브라우저를 사용하기 위한 옵션 설정
 	CM 홈 -> Hue -> 구성
-	-> 검색: HBase Thrift 서버 -> HBase Thrift Server(server01) 선택
+	-> 검색: HBase Thrift 서버 -> HBase Thrift Server(server01) 선택  # 디폴트로 선택되어 있음
 
 	# 설정 적용
 	CM 홈 -> Hue -> 재시작
@@ -38,9 +38,7 @@
 4. 스파크 설치
 	CM 홈 -> Cluster1 콤보박스 -> 서비스 추가
 	-> Spark 선택 -> 계속   # Spark(Standardalone) X
-	-> 종속성 집합 선택 페이지에서 HBase 선택 -> 계속
 	-> 역할 할당 사용자 지정 페이지 -> server02에 지정 -> 계속
-	-> 변경내용검토 페이지 -> 기본값 유지 -> 계속
 	-> 첫 번째 실행 명령 페이지 -> 설치 성공 -> 계속 -> 완료
 
 	# 스파크를 YARN에서 작동하도록 구성했으므로 YARN 서비스와 클라이언트 구성을 재시작

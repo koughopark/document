@@ -10,7 +10,7 @@
 
 	# "스마트카 용품 구매 이력" 데이터를 머하웃의 추천기에서 사용 가능한 형식으로 재구성한 파일을 만들어야 한다.
 	# 휴 -> Hive Editor 에서 아래 QL을 실행
-	========[내부코드]===========
+========[내부코드]===========
 insert overwrite local directory '/home/pilot-pjt/mahout-data/recommendation/input'
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ','
@@ -156,8 +156,7 @@ from (
 	# 예측변수에는 보정치 변수(마이너스값)와 가중치 변수(플러스값)가 있고, 이 모든 예측변수의 값을 합산해서 "6" 미만인 경우 "비정상"을 "6" 이상인 경우에 "정상"인 값을 가지는 목표변수를 정의했다.
 	# 하이브 QL의 실행 결과는 server02의 /home/pilot-pjt/mahout-data/classification/input 로컬 디렉터리에 생성된다.
 	# 위 하이브 QL을 실행하면 에디터 상에서 다음과 같은 메시지가 연속적으로 표시된다.
-	"'ascii' codec can't encode characters in position 288-289: ordinal not in range"
-	# 한글이 포함된 쿼리를 수행할 경우 중간 인코딩 변환에서 나타나는 오류로서 무시해도 좋다.
+	"'ascii' codec can't encode characters in position 288-289: ordinal not in range"   # 한글이 포함된 쿼리를 수행할 경우 중간 인코딩 변환에서 나타나는 오류로서 무시해도 좋다.
 
 	# 예측변수와 목표변수 값이 들어간 "스마트카 상태 정보" 입력 데이터셋이 정상적으로 만들어졌는지 확인한다.
 	[server02]
@@ -217,7 +216,12 @@ from (
 	p: 트레이닝 시 데이터를 분할해서 실행
 	t: 모델에 포함될 의사결정 트리 개수를 지정
 	o: 분류기 모델 생성 경로
-
+	# 정상적으로 실행되면 아래메시지 확인 가능
+	INFO mapreduce.BuildForest: Build Time: 0h 8m 42s 939
+	INFO mapreduce.BuildForest: Forest num Nodes: 19474
+	INFO mapreduce.BuildForest: Forest mean num Nodes: 194
+	INFO mapreduce.BuildForest: Forest mean max Depth: 11
+	INFO mapreduce.BuildForest: Storing the forest in: /pilot-pjt/mahout/classification/output/model/forest.seq
 	# 스마트카 상태 정보 문류 모델이 정상적으로 만들어지면 빌드시간(Build Time)과 포레스트 노드(Forest Node) 개수, 랜덤 포레스트 모델 출력 위치를 표시하게 되며, 휴의 파일 브라우저를 통해 생성된 모델의 위치를 /pilot-pjt/mahout/classification/output/model 에서 확인할수 있다. forest.seq 파일 확인
 
 	# 랜덤 포레스트의 분류기 모델을 평가해 본다. pilot-pjt/mahout/classification/input/testing 디렉터리에 만들어 놓은 파일을 입력 데이터로 해서 아래 명령을 실행한다.
@@ -229,7 +233,7 @@ from (
 	a: 평가결과 표준 출력
 	mr: 맵리듀스 기반 평가 동작
 	o: 평가 결과 출력 경로
-
+	# 평가결과(Summary)를 확인해보면 테스트 데이터를 이용한 분류 성공율이 97.5217%, 실패율이 2.4783%로 나왔다.
 	# Confusion Matrix는 비정상(a), 정상(b)의 분류 케이스들을 매트릭스로 표현한 것이다.
 	# pilot-pjt/mahout/classification/output/predictions 에는 분류 모델의 예측 결과값이 출력돼있다.
 
@@ -302,7 +306,7 @@ public class ClassifySmartCarStatus {
 	# "Classify" 파일을 로컬 디렉터리로 가져온다. HDFS의 /pilot-pjt/mahout/classification/output/model/ 에 위치한 forest.seq 파일이다.
 	mkdir /home/pilot-pjt/mahout-data/classification/model
 	cd /home/pilot-pjt/mahout-data/classification/model
-	hdfs dfs -get /pilot-pjt.mahout/classification/output/model/forest.seq
+	hdfs dfs -get /pilot-pjt/mahout/classification/output/model/forest.seq
 
 	# 스마트카 상태 정보의 분류기 모델이 정상적으로 작동하는지 ClassifySmartCarStatus.java를 실행하면서 14개의 인자값 "차량 용량", "차량 연식", "차량 모델", "타이어 상태 x 4", "라이트 상태 x 4", "엔진", "브레이크", "배터리" 를 순서대로 입력한다.
 	cd /home/pilot-pjt/mahout-data
@@ -311,6 +315,7 @@ public class ClassifySmartCarStatus {
 	# 인자값 중 맨 마지막에 있는 배터리의 상태값을 "50" -> "80"으로 바꿔서 실행해 본다.
 	java -cp bigdata.smartcar.mahout-1.0.jar com.wikibook.bigdata.smartcar.mahout.ClassifySmartCarStatus 2000 2000 A 80 80 80 80 1 1 1 1 A B 80
 	# 인자값을 다양하게 바꿔가면서 분류기의 예측 결과를 테스트한다.
+	# 실제 분류기를 적용할 때는 지속적인 학습을 거쳐 Classify 프로그램의 정확도를 높이는 과정이 중요하다.
 
 
 3. 스마트카 고객 정보 분석
@@ -322,7 +327,7 @@ public class ClassifySmartCarStatus {
 	# 하이브를 이용해 "스마트카 마스터 정보" 데이터셋을 조회해서 로컬 디스크에 저장한다. 휴의 하이브 에디터에서 다음의 경로의 QL을 실행한다.
 	# /CH07/HiveQL/2nd/그림-7.75.hql
 	휴 브라우저 -> Hive Editor
-	=============[내부코드]=============
+=============[내부코드]=============
 insert overwrite local directory '/home/pilot-pjt/mahout-data/clustering/input'
 ROW FORMAT DELIMITED
 FIELDS TERMINATED BY ' '
@@ -395,7 +400,7 @@ from smartcar_master
 	md: 최소 문서 출현 횟수
 	ng: ngrams 최댓값
 	namedVector: 네임벡터 데이터 생성
-	# 맵리듀스 잡이 여러 차례 실행되고 벡터 데이터가 정상적으로 만들어지면 휴의 파일 브라우저를 통해 pilot-pjt/mahout/clustering/output/vec 경로에 df-count, df-vectors 등의 디렉터리와 파일이 생성돼 있음을 확인할 수 있다.
+	# 맵리듀스 잡이 여러 차례 실행되고 벡터 데이터가 정상적으로 만들어지면 휴의 파일 브라우저를 통해 pilot-pjt/mahout/clustering/output/vec 경로에 df-count, tf-vectors 등의 디렉터리와 파일이 생성돼 있음을 확인할 수 있다.
 
 	# Canopy 군집분석으로 최적의 군집 개수를 파악하기 위해서는 센트로이드로부터 거리를 나타내는 t1, t2 옵션을 바꿔가며 반복적인 군집분석을 수행해야 한다.
 	# 다음과 같은 명령으로 첫 번째 Canopy 군집분석을 실행해 본다.
@@ -433,7 +438,8 @@ from smartcar_master
 
 	# 148개의 군집이 생성됐다. 2,600 명의 고객을 대상으로 148개의 군집은 적절해 보인다. 적절하다는 기준은 다소 주관적이다. 분석 요건과 데이터의 성격에 따라 적절한 군집의 개수를 판단한다.
 
-	# K_eans 군집분석을 실행할 때는 초기 군집값(K)이 필요한데, 이때 K 값으로 앞서 수행한 Canopy 군집분석에서 나온 클러스터 수(148)를 활용한다.
+	# K_Means 군집분석 시작.
+	# K_Means 군집분석을 실행할 때는 초기 군집값(K)이 필요한데, 이때 K 값으로 앞서 수행한 Canopy 군집분석에서 나온 클러스터 수(148)를 활용한다.
 	# K-Means의 K 값을 "148" 보다 좀 더 크게 해서 "200"으로 설정하고 다음 명령을 실행한다.
 	mahout kmeans -i /pilot-pjt/mahout/clustering/output/vec/tf-vectors -c /pilot-pjt/mahout/clustering/kmeans/output/cluster -o /pilot-pjt/mahout/clustering/kmeans/output -dm org.apache.mahout.common.distance.SquaredEuclideanDistanceMeasure -cd 1.0 -k 200 -x 20 -cl -xm mapreduce -ow
 	# "Map-Reduce Framework..." 메시지 확인
@@ -446,6 +452,24 @@ from smartcar_master
 	k: 군집 수 지정
 	x: 최대 반복 수행 횟수
 	xm: 실행 방식 선정
+	# 아래의 종료 메시지 확인
+	Map-Reduce Framework
+		Map input records=2600
+		Map output records=2600
+		Input split bytes=159
+		Spilled Records=0
+		Failed Shuffles=0
+		Merged Map outputs=0
+		GC time elapsed (ms)=116
+		CPU time spent (ms)=4070
+		Physical memory (bytes) snapshot=136269824
+		Virtual memory (bytes) snapshot=1499791360
+		Total committed heap usage (bytes)=78774272
+	File Input Format Counters
+		Bytes Read=422007
+	File Output Format Counters
+		Bytes Written=520916
+	INFO driver.MahoutDriver: Program took 354448 ms (Minutes: 5.907466666666667)
 
 	# K-Means 군집 분석 결과를 확인.
 	# 다음 명령을 실행하면 K-Means 군집분석 결과가 로컬 디스크의 /home/pilot-pjt/mahout-data/clustering/output/clusterdump_result.txt 에 생성된다.
@@ -482,7 +506,7 @@ from smartcar_master
 	# "VL-1418" 군집에 포함된 11대의 스마트카 마스터 정보를 휴 또는 임팔라 에디터에서 작성하고 실행한다.
 	# 조회 조건인 car_number 정보로는 독자의 파일럿 환경에서 실행했던 직전 [군집에 포함된 차량 추출]명령어 실행 결과로 출력된 차량번호들을 입력해야 한다.
 	휴 -> 임팔라 에디터 ->
-	===========[내부 코드]=============
+===========[내부 코드]=============
 select * from smartcar_master
 
 where car_number

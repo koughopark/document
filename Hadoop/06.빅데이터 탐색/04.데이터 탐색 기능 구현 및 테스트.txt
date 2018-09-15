@@ -7,28 +7,28 @@
 	# 시뮬레이터 작동시킨 날짜로 입력한다.
 	[server02]
 	cd /home/pilot-pjt/working
-	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20180905 100 &
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.CarLogMain 20180915 100 &
 
-	# /home/pilot-pjt/working/SmartCar/ 위치에 SmartCarStatusInfo_20180905(실행일).txt 파일이 100MB 크기로 생성된 것을 확인한 후, 로그 시뮬레이터 종료
+	# /home/pilot-pjt/working/SmartCar/ 위치에 SmartCarStatusInfo_20180915(실행일).txt 파일이 100MB 크기로 생성된 것을 확인한 후, 로그 시뮬레이터 종료
 	ls -alh # 파일, 용량확인
 	ps -ef | grep smartcar.log
 	kill -9 [pid]
 
 2.스마트카 상태 정보 데이터 적재
 	# 스마트카 상태 정보 데이터를 플럼의 수집 디렉터리로 옮긴다. 플럼이 수집 작업을 시작한다.
-	mv /home/pilot-pjt/working/SmartCar/SmartCarStatusInfo_20180905.txt /home/pilot-pjt/working/car-batch-log/
+	mv /home/pilot-pjt/working/SmartCar/SmartCarStatusInfo_20180915.txt /home/pilot-pjt/working/car-batch-log/
 	# 수집해서 하둡에 적재 완료되기까지 약 10여분의 시간이 걸린다.
 
 3.스마트카 상태 정보 데이터 적재 확인
 	# 오늘 날짜의 스마트카 상태 정보가 HDFS에 정상적으로 적재됐는지 확인
 	hdfs dfs -ls -R /pilot-pjt/collect/car-batch-log/
-	# 크기가 각각 65MB, 52MB인 두 개의 파일이 HDFS에 만들어져 있어야 한다. 확장자 .tmp인 파일이 있으면 하직 플럼에서 적재 중이니 완료될 때까지 기다린다.
+	# 크기가 각각 65MB, 52MB인 두 개의 파일이 HDFS에 만들어져 있어야 한다. 확장자 .tmp인 파일이 있으면 아직 플럼에서 적재 중이니 완료될 때까지 기다린다.
 
 4.스마트카 운전자 운행 로그 생성
 	# 로그 시뮬레이터를 이용해 오늘 날짜로 100대의 "스마트카 운전자의 운행 데이터"를 생성한다.
 	# 수집/적재 기능이 모두 정상적으로 시작되면 스마트카의 실시간 운행 로그 데이터를 다음 명령으로 생성
 	cd /home/pilot-pjt/working
-	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20180905 100 &
+	java -cp bigdata.smartcar.loggen-1.0.jar com.wikibook.bigdata.smartcar.loggen.DriverLogMain 20180915 100 &
 
 5.스마트카 운전자의 운행 로그 확인
 	# 실시간 운행 로그 데이터 정상 생성 확인
@@ -40,11 +40,11 @@
 
 6.스마트카 운전자의 운행 데이터 적재 확인
 	# 오늘 날짜의 모든 운행 데이터가 HBase에 정상적으로 적재됐는지 휴를 통해 확인
-	휴 -> 메뉴 [HBase] 클릭 -> [DriverCarInfo] 테이블 확인    # Hue 에서 확인 안됨
+	휴 -> 메뉴 [HBase] 클릭 -> [DriverCarInfo] 테이블 확인
 
 	# 레디스 CLI를 실행해 오늘 날짜로 과속한 스마트카 차량 정보를 확인.
 	redis-cli
-	> smembers 20180905
+	> smembers 20180915
 
 	# 과속 차량이 3대 이상 발견되면 로그시뮬레이터도 종료시킨다.
 	ps -ef | grep smartcar.log

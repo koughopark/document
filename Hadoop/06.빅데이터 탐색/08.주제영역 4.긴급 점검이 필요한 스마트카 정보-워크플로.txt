@@ -13,7 +13,7 @@
 	 새로만들기 -> 파일 -> 파일명: create_table_managed_smartcar_emergency_check_info.hql
 	 생성된 파일 클릭 -> 좌측 [파일 편집] 클릭
 	 아래 코드 입력
-	 ===========[내부코드]========================
+ ===========[내부코드]========================
 create table if not exists Managed_SmartCar_Emergency_Check_Info (
 car_number string,
 tire_check string,
@@ -34,7 +34,7 @@ stored as textfile;
 	# 같은 위치에 두번째 하이브 스크립트 파일 생성
 	새로만들기 -> 파일 -> 파일명: insert_table_managed_smartcar_emergency_check_info.hql
 	해당 파일 클릭 -> 편집 -> 아래 코드 입력
-	======[내부코드]=========
+======[내부코드]=========
 insert into table Managed_SmartCar_Emergency_Check_Info
 select
 
@@ -92,7 +92,7 @@ left outer join (select
 
 where t2.symptom is not null or t3.symptom is not null or t4.symptom is not null  or t5.symptom is not null  or t6.symptom is not null
 
-	=========================
+=========================
 	저장
 	# 하이브 쿼리를 실행하면 스마트카의 6가지 점검 상태를 분석해서 그 결과를 "스마트카 긴급 점검 차량 정보(Managed_SmartCar_Emergency_Check_Info)" 마트 테이블에 저장한다.
 	# 쿼리 내용은 주요 필드들을 가공해 스마트카 상태 점검을 위한 새로운 변수를 만들어 내는 피처 엔지니어링 쿼리로 구성돼 있다.
@@ -157,11 +157,11 @@ where t2.symptom is not null or t3.symptom is not null or t4.symptom is not null
 	휴 -> Hive Editor -> QL 입력
 	# "biz_date=20180905"의 날짜는 각자의 파일럿 환경의 실행 일자에 맞춰 입력
 	# 앞서 워크플로를 통해 만들어지는 Managed_SmartCar_Emergency_Check_Info 테이블이 휴의 Hive Editor에 곧바로 표기되지 않아 하이브 QL 실행 에러가 발생하면 좌측의 테이블 리프레시를 누른다.
-	======[내부 코드]=========
+======[내부 코드]=========
 select * from Managed_SmartCar_Emergency_Check_Info
 
-where biz_date = '20180905'
-	==========================
+where biz_date = '20180915'
+==========================
 	실행
 
 	# 한번 등록한 Coordinator는 종료 기간까지 계속 활성화된 상태로 남아 있게 되어 파일럿 PC의 리소스를 차지하게 된다.

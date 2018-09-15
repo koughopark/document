@@ -24,7 +24,7 @@
 
 2. 스쿱 설치
 	CM 홈 -> Cluster1 콤보박스 클릭 -> 서비스 추가
-	-> Sqoop 1 Client 선택 -> 계속
+	-> [Sqoop 1 Client] 선택 -> 계속
 	-> 역할 할당 사용자 지정 -> server03으로 지정 -> 계속
 	-> 첫 번째 실행 명령 -> 설치 완료 -> 계속 -> 완료
 	# 스쿱1은 클라이언트로 서버가 기동되지 않는다.
@@ -46,16 +46,17 @@
 
 	# 복사한 zeppelin-en.sh 파일을 열어서 환경변수 설정
 	vi zeppelin-env.sh
-	=========[내부 코드]=========
-	export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera
-	export HADOOP_CONF_DIR=/etc/hadoop/conf
-	=============================
-	ZEPPELIN_JAVA_OPTS => 주석 제거
+=========[내부 코드]=========
+export JAVA_HOME=/usr/java/jdk1.7.0_67-cloudera
+export HADOOP_CONF_DIR=/etc/hadoop/conf
+export ZEPPELIN_JAVA_OPTS # 기존에 입력되어 있는 라인 찾아서 주석 제거
+=============================
 
 	# 하이브의 임시 디렉터리를 제플린이 사용하기 위해 /tmp/hive 경로의 권한 변경
 	chmod 777 /tmp/hive
 
 	# 제플린에서 하이브 인터프린터를 사용하기 위해 하이브 설정 파일을 복사
+	# cp [복사할파일] [복사할 장소]
 	cp /etc/hive/conf/hive-site.xml /home/pilot-pjt/zeppelin-0.6.2-bin-all/conf
 
 	# 제플린 서버의 서비스 포트를 8080에서 8081로 변경. 이유는 스파크 마스터 서비스의 포트가 8080으로 사용중이기 때문이다.
@@ -67,7 +68,8 @@
 
 	# 복사한 zeppelin-site.xml 파일을 열어서 30번째 줄의 서버 포트 번호를 8080에서 8081로 변경
 	vi zeppelin-site.xml
-	# <value>8080</value> -> 8081로 변경
+	[내부코드]
+	<value>8080</value> -> 8081로 변경
 
 	# 제플린 명령을 편리하게 사용하기 위해 root 계정의 프로파일에 패스를 추가
 	vi /root/.bash_profile

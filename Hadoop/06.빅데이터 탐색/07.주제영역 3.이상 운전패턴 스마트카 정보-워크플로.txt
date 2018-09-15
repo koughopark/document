@@ -15,7 +15,7 @@
 	 새로만들기 -> 파일 -> 파일명: create_table_managed_smartcar_symptom_info.hql
 	 생성된 파일 클릭 -> 좌측 [파일 편집] 클릭
 	 아래 코드 입력
-	 ===========[내부코드]========================
+ ===========[내부코드]========================
 create table if not exists Managed_SmartCar_Symptom_Info (
 car_number string,
 speed_p_avg string,
@@ -37,7 +37,7 @@ stored as textfile;
 	# 같은 위치에 두번째 하이브 스크립트 파일 생성
 	새로만들기 -> 파일 -> 파일명: insert_table_managed_smartcar_symptom_info.hql
 	해당 파일 클릭 -> 편집 -> 아래 코드 입력
-	======[내부코드]=========
+======[내부코드]=========
 insert into table Managed_SmartCar_Symptom_Info
 select
        t1.car_number,
@@ -73,7 +73,7 @@ on
        (select stddev_pop(s.speed_p_avg_by_carnum) as speed_p_std, stddev_pop(s.break_p_avg_by_carnum) as break_p_std from
                 (select car_number, avg(speed_pedal) as speed_p_avg_by_carnum, avg(break_pedal) as break_p_avg_by_carnum from managed_smartcar_drive_info group by car_number) s) t4
 
-	=========================
+=========================
 	저장
 	# 한번의 실행으로 "스마트카 운전자 운행정보(Managed_SmartCar_Drive_Info)"로 부터 차량 번호별 스피드 페달, 운전대, 브레이크 페달의 데이터 분석 결과를 Managed_SmartCar_Symptom_Info 테이블에 저장한다.
 	# 쿼리를 살펴보면 전체 평균과 표준편차 값을 구하고, 당일(05일)에 차량별 편차를 구해 이상 차량임을 판단하고 있는데, 이러한 처리 과정을 데이터의 피처 엔지니어링이라고 하며, 기존의 변수를 가공해 새로운 변수와 정보를 추가하는 과정에 해당한다.
@@ -139,7 +139,7 @@ on
 	휴 -> Hive Editor -> QL 입력
 	# "biz_date=20180905"의 날짜는 각자의 파일럿 환경의 실행 일자에 맞춰 입력
 	# 앞서 워크플로를 통해 만들어지는 Managed_SmartCar_Drive_Info 테이블이 휴의 Hive Editor에 곧바로 표기되지 않아 하이브 QL 실행 에러가 발생하면 좌측의 테이블 리프레시를 누른다.
-	======[내부 코드]=========
+======[내부 코드]=========
 SELECT
     car_number,
     cast(speed_p_avg as int),
@@ -150,9 +150,8 @@ SELECT
     steer_p_symptom,
     biz_date
 FROM managed_smartcar_symptom_info
-where biz_date = '20180905'
-
-	==========================
+where biz_date = '20180915'
+==========================
 	실행
 
 	# 한번 등록한 Coordinator는 종료 기간까지 계속 활성화된 상태로 남아 있게 되어 파일럿 PC의 리소스를 차지하게 된다.

@@ -59,7 +59,7 @@ cd /home/pilot-pjt/working/driver-realtime-log
 tail -f SmartCarDriverInfo.log
 
 # 로그 시뮬레이터 종료
-[server02, 기존 창]
+[server02]
 ps -ef | grep smartcar.log  # pid 기억
 kill -9 [pid]
 
@@ -73,7 +73,7 @@ cd /home/pilot-pjt/working/SmartCar
 tail -f SmartCarStatusInfo_20160101.txt
 
 # 로그 시뮬레이터 종료
-[server02, 기존 창]
+[server02]
 ps -ef | grep smartcar.log  # pid 기억
 kill -9 [pid]
 

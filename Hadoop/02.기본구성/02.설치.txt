@@ -26,13 +26,13 @@
 	- 일반: 기본 머신 폴더:
 	- 네트워크 -> 새 네트워크 추가
 	- 전역도구 -> 호스트 네트워크 관리자 -> 어댑터 탭 -> 수동으로 어댑터 설정:
-		IPv4 주소: 192.168.56.1
+		IPv4 주소: 192.168.56.1   # 뒷자리는 1로 지정
 		IPv4 서브넷 마스크: 255.255.255.0
 	- 전역도구 -> 호스트 네트워크 관리자 -> DHCP 서버 탭 -> 서버사용함 체크
-		서버주소: 192.168.56.100
+		서버주소: 192.168.56.100    # 자신의 시작 IP의 앞번호
 		서버 마스크: 255.255.255.0
-		최저 주소 한계: 192.168.56.101
-		최고 주소 한계: 192.168.56.254
+		최저 주소 한계: 192.168.56.101    # 자신의 시작 IP 주소
+		최고 주소 한계: 192.168.56.254    # 자신의 마지막 IP 주소
 	- 입력 -> 가상머신 -> 호스트 키 조합 Alt + Ctrl
 
 	- 새로만들기
@@ -48,6 +48,7 @@
 	개별 환경
 		- 네트워크: 브릿지 어댑터     # ppt 내용
 		- 저장소 광학드라이브 -> 리눅스 iso 파일 삽입 -> 시작
+		# 가상 머신 시작할때 "Unable to boot..." 에러는 바이오스에서 Virtualization 을 활성화 해줘야 한다.
 
 3. 가상환경에서 리눅스 설치 진행
 	- Disc Found Skip
@@ -93,6 +94,7 @@ insert 누르고 OnBOOT=no -> yes 변경후 ESC 누르고 :wq 하고 나온다. 
 vi /etc/sysconfig/network-scripts/ifcfg-eth0
 insert 누르고 OnBOOT=no -> yes
 HWADDR=네트워크 어댑터2 MAC 주소 부분 입력
+BOOTPROTO=static
 IPADDR=192.168.1.(값)
 NETMASK=255.255.255.0
 GATEWAY=192.168.1.1
@@ -294,6 +296,8 @@ vi /etc/hosts
 
 vi /etc/sysconfig/network
 HOSTNAME=server01.hadoop.com => server02.hadoop.com 로 수정
+
+# hostnamectl set-hostname server02.hadoop.com  # centos7 에서 호스트 변경
 
 service network restart
 reboot

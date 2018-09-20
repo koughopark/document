@@ -39,10 +39,10 @@
 
 	# HDFS에 적재된 스마트카 상태 정보 파일 내용 확인
 	# hdfs dfs -cat "출력된 디렉터리/파일명.log"
-	hdfs dfs -cat /pilot-pjt/collect/car-batch-log/wrk_date=20180913/car-batch-log.1536822153292.log
+	hdfs dfs -cat /pilot-pjt/collect/car-batch-log/wrk_date=20180920/car-batch-log.1537451809829.log
 
 	# 단순 데이터 확인에는 tail 명령을 권장
-	hdfs dfs -tail /pilot-pjt/collect/car-batch-log/wrk_date=20180913/car-batch-log.1536822153292.log
+	hdfs dfs -tail /pilot-pjt/collect/car-batch-log/wrk_date=20180920/car-batch-log.1537451809829.log
 	# 출력 정보: 앞의 날짜는 데이터 발생 일자, 뒤에붙은 날짜는 데이터 수집일자, 플럼의 인터셉터가 붙여넣은 추가 정보다.
 
 	# 백그라운드로 실행했던 스마트카 로그 시뮬레이터 종료

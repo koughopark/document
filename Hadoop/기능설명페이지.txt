@@ -1,0 +1,64 @@
+
+
+ Accumulo
+The Apache Accumulo sorted, distributed key/value store is a robust, scalable, high performance data storage and retrieval system. This service only works with releases based on Apache Accumulo 1.6 or later.
+
+ Flume
+Flume은 대부분의 소스에서 데이터를 수집 및 집계하여 HDFS 같은 영구 스토리지로 저장합니다.
+
+ HBase
+Apache HBase는 대규모 데이터 세트에 임의의 실시간 읽기/쓰기 액세스를 제공합니다(HDFS와 ZooKeeper 필요).
+
+ HDFS
+Apache HDFS(Hadoop Distributed File System)는 Hadoop 애플리케이션이 사용하는 기본 스토리지 시스템입니다. HDFS는 데이터 블록에 대한 여러 개의 복제본을 생성하고 이를 클러스터 전반에 걸쳐 컴퓨팅 호스트에 배포하여 안정적이고 매우 빠른 계산을 지원합니다.
+
+ Hive
+Hive는 SQL과 유사한 언어인 HiveQL을 제공하는 데이터 웨어하우스 시스템입니다.
+
+ Hue
+Hue는 Cloudera의 Distribution Including Apache Hadoop과 함께 작동하는 GUI(그래픽 사용자 인터페이스)입니다(HDFS, MapReduce 및 Hive 필요).
+
+ Impala
+Impala에서는 HDFS 및 HBase에 저장된 데이터에 대해 실시간 SQL 쿼리 인터페이스를 제공합니다. Impala에는 Hive 서비스가 필요하며 Hue와 Hive Metastore를 공유합니다.
+
+ Isilon
+EMC Isilon is a distributed filesystem.
+
+ Java KeyStore KMS
+The Hadoop Key Management Service with file-based Java KeyStore. Maintains a single copy of keys, using simple password-based protection. Requires CDH 5.3+. Not recommended for production use.
+
+ Kafka
+Apache Kafka is publish-subscribe messaging rethought as a distributed commit log. Before adding this service, ensure that either the Kafka parcel is activated or the Kafka package is installed.
+
+ Key-Value Store Indexer
+Key-Value Store Indexer는 HBase에 포함된 테이블 안의 데이터의 변경 사항을 수신 대기하고 Solr을 사용하여 인덱싱합니다.
+
+ MapReduce
+Apache Hadoop MapReduce는 클러스터 전체에서 대규모 데이터 세트에 배포된 컴퓨팅을 지원합니다(HDFS 필요). 대신 YARN(MapReduce 2 포함)을 권장합니다. 역호환성을 위해 MapReduce가 포함됩니다.
+
+ Oozie
+Oozie는 클러스터의 데이터 처리 작업을 관리하는 워크플로우 조정 서비스입니다.
+
+ Sentry
+Sentry 서비스는 인증 정책 메타데이터를 저장하고 동시 클라이언트와 이 메타데이터에 대해 안전하게 보호된 액세스를 제공합니다.
+
+ Solr
+Solr은 HDFS에 저장된 데이터를 인덱싱 및 검색하는 배포 서비스입니다.
+
+ Spark
+Apache Spark is an open source cluster computing system. This service runs Spark as an application on YARN.
+
+ Spark (Standalone)
+Apache Spark is an open source cluster computing system. This is the standalone version of the service which does not use YARN for resource management. Cloudera recommends using Spark on YARN instead of this standalone version.
+
+ Sqoop 1 Client
+Configuration and connector management for Sqoop 1.
+
+ Sqoop 2
+Sqoop은 Apache Hadoop과 관계형 데이터베이스와 같은 구조적 데이터스토어 간에 대량 데이터를 효율적으로 전송하도록 설계되었습니다. Cloudera Manager에서 지원하는 버전은 Sqoop 2입니다.
+
+ YARN (MR2 Included)
+YARN이라고도 하는 MRv2(Apache Hadoop MapReduce 2.0)는 MapReduce 애플리케이션을 지원하는 데이터 계산 프레임워크입니다(HDFS 필요).
+
+ ZooKeeper
+Apache ZooKeeper는 구성 데이터를 유지하고 동기화하는 중앙 집중식 서비스입니다.

@@ -1,3 +1,12 @@
+# 하둡 라이브러리 시작 순서
+1. CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cloudera Management Service] 콤보박스 클릭 -> 재시작
+2. CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cluster1] 콤보박스 클릭 -> 재시작
+# 종료
+1. 클러스터 종료
+2. 클라우데라 매니저 종료
+
+
+
 # 실시간 적재환경 구성 실행, 서버 재구동 하고 다시 실행시켜줘야 한다.
 /etc/init.d/storm-nimbus start
 /etc/init.d/storm-supervisor start
@@ -7,10 +16,3 @@
 /etc/init.d/storm-supervisor status
 /etc/init.d/storm-ui status
 
-# 하둡 라이브러리 시작 순서
-1. CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cloudera Management Service] 콤보박스 클릭 -> 재시작
-2. CM의 홈화면 왼쪽 메뉴 그룹 가운데 [Cluster1] 콤보박스 클릭 -> 재시작
-
-# 종료
-1. 클러스터 종료
-2. 클라우데라 매니저 종료

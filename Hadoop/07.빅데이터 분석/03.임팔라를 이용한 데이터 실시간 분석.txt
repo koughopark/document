@@ -1,18 +1,19 @@
 1.하이브 QL을 임팔라에서 실행하기
 	# 6장의 데이터 탐색에서 주제 영역 3에서 사용했던 하이브 QL을 임팔라로 재실행 한다.
 	# 이상 운전 패턴 스마트카 정보 조회
-	select * from Managed_SmartCar_Symptom_Info where biz_date = '20180905'
+	select * from Managed_SmartCar_Symptom_Info where biz_date = '20180915'
 
-	휴 -> 상단 메뉴 [쿼리] 콤보박스 -> 편집기 -> Impala 클릭
+	휴 -> 상단 메뉴 [Query Editors] -> Impala 클릭 # hue3
+	휴 -> 상단 메뉴 [쿼리] 콤보박스 -> 편집기 -> Impala 클릭    # hue4
 
 	# 데이터 베이스 표시 안되면 새로고침 클릭, 그래도 안나오면 임팔라 재시작 이후 새로고침
 
 	# 6장의 주제영역 4, 5에 대한 스마트카 분석 쿼리를 임팔라를 이용해 추가 실행
 	# 긴급 점검이 필요한 스마트카 정보 조회
-	select * from Managed_SmartCar_Emergency_Check_Info where biz_date = '20180905'
+	select * from Managed_SmartCar_Emergency_Check_Info where biz_date = '20180915'
 
 	# 스마트카 차량용품 구매 이력 정보 조회
-	select * from Managed_SmartCar_Item_BuyList_Info where biz_month = '201809'
+	select * from Managed_SmartCar_Item_BuyList_Info where biz_month = '201606' # 테이블 생성에 참조된 업로드된 파일 자체가 201606 파일이다.
 
 
 2. 임팔라를 이용한 운행 지역 분석

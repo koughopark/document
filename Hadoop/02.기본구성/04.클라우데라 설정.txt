@@ -60,6 +60,7 @@
 	hdfs fsck /
 	# 파일 시스템 전체 상태 출력
 	hdfs dfsadmin -report
+	============================
 	# CORRUPT, MISSING 항목에 숫자가 있을경우
 	# 안전모드 해제
 	hdfs dfsadmin -safemode leave
@@ -67,9 +68,10 @@
 	hdfs fsck / -delete
 	# 손상된 파일 /lost + found 디렉토리로 이동
 	hdfs fsck / -move
+	===============================
 
 	# HDFS에 저장된 파일 로컬 파일시스템으로 가져오기
-	hdfs dfs -get /tmp/Sample2.txt  # 로컬 /home/pilot-pjt/ 디렉터리에 Sample2.txt 파일 생성
+	hdfs dfs -get /tmp/Sample2.txt  # 로컬 /home/bigdata/ 디렉터리에 Sample2.txt 파일 생성
 
 	# HDFS의 저장한 파일 삭제(휴지통)
 	hdfs dfs -rm /tmp/Sample2.txt   # 휴지통에 들어가고 24시간 이내에 복구 가능

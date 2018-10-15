@@ -1,0 +1,6 @@
+환경 변수 설정
+변수이름: JAVA_HOME
+변수값: C:\Program Files\Java\jdk1.8.0_171
+
+Path 추가
+%JAVA_HOME%\bin
